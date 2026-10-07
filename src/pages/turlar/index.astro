@@ -1,0 +1,168 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FadeIn from '../../components/ui/FadeIn';
+import MediaSlider from '../../components/ui/MediaSlider';
+
+export const prerender = true;
+
+const tours = await getCollection('tours');
+const categoriesCollection = await getCollection('categories');
+const sortedTours = tours.sort((a, b) => a.data.order - b.data.order);
+
+// Category map to Turkish labels
+const categoryMap = new Map<string, string>();
+categoriesCollection.forEach(cat => {
+  categoryMap.set(cat.data.slug, cat.data.label_tr);
+});
+
+// Unique categories present in tours
+const uniqueCategorySlugs = [...new Set(tours.map(tour => tour.data.category))];
+const categories = uniqueCategorySlugs.map(slug => ({
+  slug,
+  label: categoryMap.get(slug) || slug.replace(/-/g, ' ')
+}));
+---
+
+<Layout title="Tüm Turlar" description="Phuket'teki tüm turlarımız ve rotalarımız.">
+  <div class="bg-brand-primary text-white py-16 px-4 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto text-center relative z-10">
+      <FadeIn client:load direction="up">
+        <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Tüm Turlar</h1>
+      </FadeIn>
+      <FadeIn client:load delay={0.2} direction="up">
+        <p class="text-slate-300 max-w-xl mx-auto text-base mb-10">
+          Günübirlik ada turlarından özel VIP rotalara kadar Phuket'i bizimle keşfedin.
+        </p>
+      </FadeIn>
+      
+      <!-- Slider -->
+      <FadeIn client:load delay={0.4} direction="up">
+        <div class="max-w-3xl mx-auto">
+          <MediaSlider client:load />
+        </div>
+      </FadeIn>
+    </div>
+  </div>
+
+  <section class="py-16 bg-slate-50 dark:bg-[#0a0f1a] px-4">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Filter Categories -->
+      <div class="flex flex-wrap justify-center gap-4 mb-12">
+        <button data-filter="all" class="filter-btn px-6 py-2.5 rounded-full bg-brand-accent text-white font-medium shadow-md transition-colors">Tümü</button>
+        {categories.map(cat => (
+          <button data-filter={cat.slug} class="filter-btn px-6 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium shadow hover:shadow-md transition-colors border border-slate-100 dark:border-slate-700">
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Tours Grid -->
+      <div id="tours-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {sortedTours.map((tour, index) => (
+          <div class="tour-card" data-category={tour.data.category}>
+            <FadeIn client:visible delay={0.1 * (index % 3)} direction="up">
+              <a href={`/turlar/${tour.id}`} class="group block rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
+                <div class="relative h-64 overflow-hidden">
+                  <img 
+                    src={`/assets/${tour.data.image}`} 
+                    alt={tour.data.title}
+                    class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div class="absolute inset-0 bg-brand-primary/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                  <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-brand-primary text-xs font-bold px-3 py-1 rounded-full">
+                    {tour.data.category_label || categoryMap.get(tour.data.category) || tour.data.category}
+                  </div>
+                </div>
+                <div class="p-6">
+                  <h2 class="text-xl font-bold mb-2 group-hover:text-brand-accent transition-colors text-brand-primary dark:text-white">{tour.data.title}</h2>
+                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-4 line-clamp-2">{tour.data.excerpt}</p>
+                  <div class="flex justify-between items-center border-t border-slate-100 dark:border-slate-700 pt-4 mt-4">
+                    <span class="text-sm font-medium text-slate-500 dark:text-slate-400">{tour.data.duration || 'Tam Gün'}</span>
+                    {tour.data.price_thb && tour.data.price_thb > 0 ? (
+                      <span class="text-lg font-bold text-brand-primary dark:text-white">{tour.data.price_thb.toLocaleString()} THB</span>
+                    ) : (
+                      <span class="text-xs font-bold text-brand-accent bg-brand-accent/10 px-2.5 py-1 rounded-full">Fiyat Teklifi Alın</span>
+                    )}
+                  </div>
+                </div>
+              </a>
+            </FadeIn>
+          </div>
+        ))}
+      </div>
+      
+      <!-- Empty State (Hidden by default) -->
+      <div id="no-tours-message" class="hidden text-center py-20 bg-white dark:bg-slate-800 rounded-3xl p-12 shadow-sm border border-slate-100 dark:border-slate-700">
+        <h3 class="text-2xl font-bold text-slate-400 dark:text-slate-300 mb-2">Tur Bulunamadı</h3>
+        <p class="text-slate-500 dark:text-slate-400">Bu kategoriye ait turumuz bulunmamaktadır.</p>
+      </div>
+
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Script that runs on client side to handle filtering
+  document.addEventListener('astro:page-load', () => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const tourCards = document.querySelectorAll('.tour-card');
+    const noToursMessage = document.getElementById('no-tours-message');
+
+    // Function to apply filter
+    function applyFilter(filterValue: string) {
+      // Update buttons active state
+      filterBtns.forEach(btn => {
+        if (btn.getAttribute('data-filter') === filterValue) {
+          btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+          btn.classList.add('bg-brand-accent', 'text-white');
+        } else {
+          btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+          btn.classList.remove('bg-brand-accent', 'text-white');
+        }
+      });
+
+      // Filter cards
+      let visibleCount = 0;
+      tourCards.forEach((card: any) => {
+        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Show/hide no tours message
+      if (noToursMessage) {
+        if (visibleCount === 0) {
+          noToursMessage.classList.remove('hidden');
+        } else {
+          noToursMessage.classList.add('hidden');
+        }
+      }
+      
+      // Update URL hash without jumping
+      history.replaceState(null, '', filterValue === 'all' ? window.location.pathname : `#${filterValue}`);
+    }
+
+    // Add click events to buttons
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e: any) => {
+        const target = e.currentTarget || e.target;
+        const filterValue = target.getAttribute('data-filter');
+        if (filterValue) applyFilter(filterValue);
+      });
+    });
+
+    // Read initial hash on load if present
+    const initialHash = window.location.hash.replace('#', '');
+    if (initialHash) {
+      const validCategories = Array.from(filterBtns).map(btn => btn.getAttribute('data-filter'));
+      if (validCategories.includes(initialHash)) {
+        applyFilter(initialHash);
+      }
+    }
+  });
+</script>

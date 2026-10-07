@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FadeIn from '../components/ui/FadeIn';
+
+export const prerender = true;
+---
+
+<Layout title="Sayfa Bulunamadı">
+  <div class="min-h-[70vh] flex items-center justify-center bg-slate-50 px-4">
+    <div class="text-center">
+      <FadeIn client:load direction="up">
+        <h1 class="text-8xl md:text-9xl font-serif font-bold text-brand-primary opacity-20 mb-4">404</h1>
+      </FadeIn>
+      <FadeIn client:load delay={0.2} direction="up">
+        <h2 class="text-3xl md:text-4xl font-bold text-brand-primary mb-4">Rotayı Kaybettik!</h2>
+      </FadeIn>
+      <FadeIn client:load delay={0.4} direction="up">
+        <p class="text-slate-600 mb-8 max-w-md mx-auto">
+          Aradığınız sayfayı bulamadık. Belki de bu ada henüz keşfedilmemiştir. Ana rotaya dönmeye ne dersiniz?
+        </p>
+        <a href="/" class="bg-brand-accent hover:bg-brand-accent/90 text-white px-8 py-4 rounded-full font-bold transition-transform transform hover:scale-105 inline-block shadow-lg">
+          Ana Sayfaya Dön
+        </a>
+      </FadeIn>
+    </div>
+  </div>
+</Layout>

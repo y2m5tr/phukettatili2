@@ -1,0 +1,154 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FadeIn from '../../components/ui/FadeIn';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const categories = await getCollection('categories');
+  const allTours = await getCollection('tours');
+
+  const paths: any[] = [];
+
+  for (const cat of categories) {
+    const matchingTours = allTours.filter((t: any) => t.data.category === cat.data.slug);
+    paths.push({
+      params: { category: cat.data.slug },
+      props: {
+        categoryName: cat.data.name,
+        categoryLabel: cat.data.label_tr,
+        categorySlug: cat.data.slug,
+        description: cat.data.description,
+        heroImage: cat.data.hero_image,
+        tours: matchingTours,
+      },
+    });
+
+    if (cat.data.children) {
+      for (const child of cat.data.children) {
+        const childTours = allTours.filter(
+          (t: any) => t.data.subcategory === child.slug || t.data.category === child.slug
+        );
+        paths.push({
+          params: { category: child.slug },
+          props: {
+            categoryName: child.name,
+            categoryLabel: child.label_tr,
+            categorySlug: child.slug,
+            description: child.description || cat.data.description,
+            heroImage: child.hero_image || cat.data.hero_image,
+            tours: childTours,
+            parentCategoryLabel: cat.data.label_tr,
+            parentCategorySlug: cat.data.slug,
+          },
+        });
+      }
+    }
+  }
+
+  return paths;
+}
+
+const {
+  categoryLabel,
+  description,
+  heroImage,
+  tours,
+} = Astro.props;
+---
+
+<Layout title={`${categoryLabel} — Phuket Turları`} description={description} image={heroImage ? `/assets/${heroImage}` : '/assets/phuket_hero.jpg'}>
+  <!-- Hero Section -->
+  <section class="relative h-[50vh] min-h-[350px] flex items-end pb-12 overflow-hidden bg-brand-primary">
+    <div class="absolute inset-0 z-0">
+      <img
+        src={heroImage ? `/assets/${heroImage}` : '/assets/phuket_hero.jpg'}
+        alt={categoryLabel}
+        class="w-full h-full object-cover animate-ken-burns"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-[#0a0f1a]/60 to-transparent z-10"></div>
+    </div>
+
+    <div class="relative z-20 max-w-6xl mx-auto px-4 w-full">
+      <FadeIn client:load direction="up">
+        <span class="inline-block bg-brand-accent text-white px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-3 shadow-lg">
+          Tur Kategorisi
+        </span>
+        <h1 class="text-4xl md:text-6xl text-white font-serif font-bold mb-3 drop-shadow-md">
+          {categoryLabel}
+        </h1>
+        {description && (
+          <p class="text-slate-200 max-w-2xl text-base md:text-lg font-light leading-relaxed">
+            {description}
+          </p>
+        )}
+      </FadeIn>
+    </div>
+  </section>
+
+  <!-- Tours Grid -->
+  <section class="py-16 bg-slate-50 dark:bg-[#0a0f1a] px-4 min-h-[400px]">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 border-b border-slate-200 dark:border-slate-800 pb-6">
+        <div>
+          <h2 class="text-2xl font-serif font-bold text-brand-primary dark:text-white">
+            {categoryLabel} ({tours.length} Tur)
+          </h2>
+          <p class="text-slate-500 text-sm mt-1">Özel rehberlik ve transfer olanaklarıyla planlanmış rotalar</p>
+        </div>
+        <a href="/turlar" class="inline-flex items-center text-brand-accent font-semibold hover:underline text-sm">
+          ← Tüm Turları Gör
+        </a>
+      </div>
+
+      {tours.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {tours.map((tour: any, index: number) => (
+            <FadeIn client:visible delay={0.1 * (index % 3)} direction="up">
+              <a href={`/turlar/${tour.id}`} class="group block rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
+                <div class="relative h-64 overflow-hidden">
+                  <img 
+                    src={`/assets/${tour.data.image}`} 
+                    alt={tour.data.title}
+                    class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div class="absolute inset-0 bg-brand-primary/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                  <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-brand-primary text-xs font-bold px-3 py-1 rounded-full">
+                    {tour.data.category_label || categoryLabel}
+                  </div>
+                </div>
+                <div class="p-6">
+                  <h3 class="text-xl font-bold mb-2 group-hover:text-brand-accent transition-colors text-brand-primary dark:text-white">{tour.data.title}</h3>
+                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-4 line-clamp-2">{tour.data.excerpt}</p>
+                  <div class="flex justify-between items-center border-t border-slate-100 dark:border-slate-700 pt-4 mt-4">
+                    <span class="text-sm font-medium text-slate-500 dark:text-slate-400">{tour.data.duration || 'Tam Gün'}</span>
+                    {tour.data.price_thb && tour.data.price_thb > 0 ? (
+                      <span class="text-lg font-bold text-brand-primary dark:text-white">{tour.data.price_thb.toLocaleString()} THB</span>
+                    ) : (
+                      <span class="text-xs font-bold text-brand-accent bg-brand-accent/10 px-2.5 py-1 rounded-full">Fiyat Teklifi Alın</span>
+                    )}
+                  </div>
+                </div>
+              </a>
+            </FadeIn>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl p-12 shadow-sm border border-slate-100 dark:border-slate-700">
+          <h3 class="text-2xl font-serif font-bold text-brand-primary dark:text-white mb-3">Bu Kategoride Yeni Rotalar Hazırlanıyor</h3>
+          <p class="text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-8">
+            {categoryLabel} için özel rota ve fiyat taleplerinizi doğrudan WhatsApp hattımız üzerinden sorabilirsiniz.
+          </p>
+          <a
+            href={`https://wa.me/66828950665?text=${encodeURIComponent(`Merhaba, ${categoryLabel} rotaları hakkında bilgi almak istiyorum.`)}`}
+            target="_blank"
+            class="inline-flex items-center gap-2 bg-[#25D366] text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#128C7E] transition-all shadow-lg"
+          >
+            WhatsApp ile Rota İste ↗
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

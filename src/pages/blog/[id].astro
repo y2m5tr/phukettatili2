@@ -1,0 +1,72 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FadeIn from '../../components/ui/FadeIn';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post: any) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Layout
+  title={`${post.data.title} — Phuket Tatili Rehberi`}
+  description={post.data.excerpt}
+  image={post.data.cover_image ? `/assets/${post.data.cover_image}` : '/assets/beach.webp'}
+>
+  <!-- Hero Section -->
+  <section class="relative h-[50vh] min-h-[350px] flex items-end pb-12 overflow-hidden bg-brand-primary">
+    <div class="absolute inset-0 z-0">
+      <img
+        src={post.data.cover_image ? `/assets/${post.data.cover_image}` : '/assets/beach.webp'}
+        alt={post.data.title}
+        class="w-full h-full object-cover animate-ken-burns"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-[#0a0f1a]/60 to-transparent z-10"></div>
+    </div>
+
+    <div class="relative z-20 max-w-4xl mx-auto px-4 w-full">
+      <FadeIn client:load direction="up">
+        <a href="/blog" class="inline-flex items-center text-brand-accent text-sm font-semibold mb-3 hover:underline">
+          ← Tüm Rehber Yazıları
+        </a>
+        <h1 class="text-3xl md:text-5xl text-white font-serif font-bold mb-4 drop-shadow-md">
+          {post.data.title}
+        </h1>
+        <div class="flex items-center gap-4 text-slate-300 text-xs md:text-sm">
+          <span>{post.data.author || 'Phuket Tatili Ekibi'}</span>
+        </div>
+      </FadeIn>
+    </div>
+  </section>
+
+  <!-- Content Section -->
+  <section class="py-16 bg-white dark:bg-[#0a0f1a] px-4">
+    <div class="max-w-3xl mx-auto">
+      <article class="prose prose-lg prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-brand-primary dark:prose-headings:text-white prose-a:text-brand-accent hover:prose-a:underline max-w-none">
+        <Content />
+      </article>
+
+      <div class="mt-16 pt-8 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <a href="/blog" class="text-brand-accent font-bold hover:underline">
+          ← Rehbere Dön
+        </a>
+        <a
+          href={`https://wa.me/66828950665?text=${encodeURIComponent('Merhaba, Phuket rehberinizdeki bilgiler hakkında bir sorum olacaktı.')}`}
+          target="_blank"
+          class="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#128C7E] transition-all shadow-md"
+        >
+          WhatsApp ile Danışın
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

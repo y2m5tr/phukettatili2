@@ -1,0 +1,148 @@
+backend:
+  name: git-gateway # Eğer Netlify veya benzeri bir servisle (Github) entegre edecekseniz standart backend
+  branch: main # Kodunuzun bulunduğu ana dal
+  
+media_folder: "public/assets"
+public_folder: "/assets"
+
+site_url: https://phukettatili.com
+display_url: https://phukettatili.com
+logo_url: https://phukettatili.com/assets/logo-favicon.png
+
+locale: "tr" # Yönetici panelini Türkçe yapar
+
+collections:
+  - name: "settings"
+    label: "Genel Ayarlar"
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: "general"
+        label: "Site Genel Ayarları"
+        file: "src/content/settings/general.json"
+        description: "WhatsApp numarası, SEO başlıkları ve sosyal medya hesapları"
+        fields:
+          - { label: "WhatsApp Numarası", name: "whatsapp_number", widget: "string", hint: "Sadece rakamlarla (Örn: 66828950665)" }
+          - { label: "Site Başlığı (SEO)", name: "site_title", widget: "string" }
+          - { label: "Site Açıklaması (SEO)", name: "site_description", widget: "text" }
+          - { label: "Instagram Linki", name: "instagram", widget: "string", required: false }
+          - { label: "İletişim E-Postası", name: "contact_email", widget: "string", required: false }
+      - name: "testimonials"
+        label: "Müşteri Yorumları"
+        file: "src/content/settings/testimonials.json"
+        description: "Ana sayfada görünen yorumlar (Liste)"
+        fields:
+          - label: "Yorum Listesi"
+            name: "testimonials"
+            widget: "list"
+            fields:
+              - { label: "Müşteri Adı", name: "name", widget: "string" }
+              - { label: "Tipi (Örn: Balayı Çifti)", name: "type", widget: "string" }
+              - { label: "Katıldığı Tur", name: "tour", widget: "string" }
+              - { label: "Yorum Metni", name: "text", widget: "text" }
+              - { label: "Yıldız Sayısı (1-5)", name: "stars", widget: "number", value_type: "int", default: 5 }
+      - name: "faq"
+        label: "Sıkça Sorulan Sorular (SSS)"
+        file: "src/content/settings/faq.json"
+        description: "Ana sayfanın en altında yer alan açılır/kapanır sorular"
+        fields:
+          - label: "Soru Listesi"
+            name: "faq"
+            widget: "list"
+            fields:
+              - { label: "Soru", name: "question", widget: "string" }
+              - { label: "Cevap", name: "answer", widget: "text" }
+
+  - name: "categories"
+    label: "Kategoriler"
+    folder: "src/content/categories"
+    create: true
+    extension: "json"
+    format: "json"
+    slug: "{{slug}}"
+    fields:
+      - { label: "Kategori Adı (İngilizce Slug)", name: "name", widget: "string", hint: "Örn: Island Tours" }
+      - { label: "Kategori Başlığı (Türkçe)", name: "label_tr", widget: "string", hint: "Örn: Ada Turları" }
+      - { label: "Kategori URL (Slug)", name: "slug", widget: "string", hint: "Örn: island-tours" }
+      - { label: "İkon (Emoji)", name: "icon", widget: "string", required: false }
+      - { label: "Kısa Açıklama", name: "short_desc", widget: "string", required: false }
+      - { label: "Uzun Açıklama", name: "description", widget: "text", required: false }
+      - { label: "Kapak Görseli", name: "hero_image", widget: "image", required: false }
+      - { label: "Sıralama", name: "order", widget: "number", value_type: "int", required: false }
+      - label: "Alt Rotalar (Çocuk Kategoriler)"
+        name: "children"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Rota Adı (İngilizce)", name: "name", widget: "string" }
+          - { label: "Rota Adı (Türkçe)", name: "label_tr", widget: "string" }
+          - { label: "URL (Slug)", name: "slug", widget: "string" }
+          - { label: "Açıklama", name: "description", widget: "text" }
+          - { label: "Görsel", name: "hero_image", widget: "image" }
+
+  - name: "services"
+    label: "Hizmetler (Sayfalar)"
+    folder: "src/content/services"
+    create: false
+    extension: "json"
+    format: "json"
+    slug: "{{slug}}"
+    fields:
+      - { label: "Sayfa Başlığı", name: "title", widget: "string" }
+      - { label: "Menü Adı", name: "menu_label", widget: "string" }
+      - { label: "URL Kısaltması", name: "slug", widget: "string", hint: "Düzenlemeyin" }
+      - { label: "Üst Başlık (Eyebrow)", name: "eyebrow", widget: "string" }
+      - { label: "Ana Başlık (Heading)", name: "heading", widget: "string" }
+      - { label: "Giriş Metni (Intro)", name: "intro", widget: "text" }
+      - { label: "Sayfa Görseli", name: "media", widget: "image" }
+      - { label: "Görsel Açıklaması", name: "media_alt", widget: "string" }
+      - { label: "Görsel Alt Yazısı", name: "media_caption", widget: "string", required: false }
+      - { label: "Sıralama", name: "order", widget: "number", value_type: "int" }
+      - label: "Seçenekler / Özellikler"
+        name: "options"
+        widget: "list"
+        fields:
+          - { label: "Başlık", name: "title", widget: "string" }
+          - { label: "Açıklama", name: "text", widget: "text" }
+      - label: "WhatsApp'ta Sorulacak Sorular (Müşteriye)"
+        name: "questions"
+        widget: "list"
+        field: { label: "Soru", name: "item", widget: "string" }
+      - { label: "WhatsApp Başlığı (Bağlam)", name: "cta_context", widget: "string" }
+      - { label: "WhatsApp Mesajı Şablonu", name: "cta_details", widget: "text" }
+
+  - name: "blog"
+    label: "Gezi Rehberi (Blog)"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Makale Başlığı", name: "title", widget: "string" }
+      - { label: "Kısa Açıklama (Özet)", name: "excerpt", widget: "text" }
+      - { label: "Kapak Fotoğrafı", name: "cover_image", widget: "image" }
+      - { label: "Yayın Tarihi", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "Yazar", name: "author", widget: "string", default: "Phuket Tatili Ekibi" }
+      - { label: "Öne Çıkan Yazı Mı?", name: "featured", widget: "boolean", default: false, required: false }
+      - { label: "Makale İçeriği", name: "body", widget: "markdown" }
+
+  - name: "tours"
+    label: "Turlar"
+    folder: "src/content/tours"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Tur Adı", name: "title", widget: "string" }
+      - { label: "Kategori", name: "category", widget: "select", options: ["island-tours", "adventure-tours", "entertainment-tours", "transfers", "private-yacht"] }
+      - { label: "Alt Kategori", name: "subcategory", widget: "string", required: false }
+      - { label: "Kategori Etiketi", name: "category_label", widget: "string", hint: "Örn: Phi Phi Adaları" }
+      - { label: "Kısa Açıklama", name: "excerpt", widget: "text" }
+      - { label: "Kapak Görseli", name: "image", widget: "image" }
+      - { label: "Galeri Görselleri (İsteğe Bağlı)", name: "gallery", widget: "list", field: { label: "Görsel", name: "image", widget: "image" }, required: false }
+      - { label: "Fiyat Tipi", name: "price_type", widget: "select", options: ["fixed", "quote"], default: "quote" }
+      - { label: "Fiyat (THB)", name: "price_thb", widget: "number", required: false }
+      - { label: "Süre", name: "duration", widget: "string", default: "Tam gün" }
+      - { label: "Dahil Olanlar", name: "included", widget: "list", field: { label: "Madde", name: "item", widget: "string" } }
+      - { label: "Hariç Olanlar", name: "excluded", widget: "list", field: { label: "Madde", name: "item", widget: "string" } }
+      - { label: "Tur Programı", name: "program", widget: "list", field: { label: "Madde", name: "item", widget: "string" } }
+      - { label: "Tur Detay İçeriği", name: "body", widget: "markdown" }

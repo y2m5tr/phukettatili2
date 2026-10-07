@@ -1,0 +1,84 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FadeIn from '../components/ui/FadeIn';
+
+export const prerender = true;
+---
+
+<Layout title="VIP Hizmetler" description="Özel araçlar, lüks tekneler ve kişiye özel turlar.">
+  <div class="bg-brand-primary text-white py-24 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-40 z-0">
+      <img src="/assets/phuket_yacht.jpg" alt="Phuket VIP Yacht" class="w-full h-full object-cover animate-ken-burns" />
+    </div>
+    <div class="relative max-w-4xl mx-auto text-center z-10">
+      <FadeIn client:load direction="up">
+        <h1 class="text-4xl md:text-6xl font-serif font-bold mb-6">VIP <span class="text-brand-accent italic">Ayrıcalığı</span></h1>
+      </FadeIn>
+      <FadeIn client:load delay={0.2} direction="up">
+        <p class="text-slate-300 text-lg md:text-xl font-light">
+          Size ve sevdiklerinize özel, sıradanlıktan uzak, kusursuz detaylarla örülmüş seyahat deneyimleri.
+        </p>
+      </FadeIn>
+    </div>
+  </div>
+
+  <section class="py-24 bg-white px-4">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Service 1 -->
+      <div class="flex flex-col md:flex-row gap-12 items-center mb-24">
+        <div class="md:w-1/2 w-full">
+          <FadeIn client:visible direction="right">
+            <div class="aspect-video rounded-3xl overflow-hidden shadow-xl">
+              <img src="/assets/phuket_yacht.jpg" alt="Özel Yat" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-700" />
+            </div>
+          </FadeIn>
+        </div>
+        <div class="md:w-1/2 w-full">
+          <FadeIn client:visible delay={0.2} direction="left">
+            <h3 class="text-3xl font-serif text-brand-primary font-bold mb-4">Özel Yat ve Katamaran Kiralama</h3>
+            <p class="text-slate-600 mb-6 leading-relaxed">
+              Kalabalıktan uzak, sadece size ait bir rota oluşturun. Phi Phi, James Bond, Racha veya Similan Adaları'na aileniz veya arkadaş grubunuzla konforlu, lüks ve izole bir seyahat gerçekleştirin.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-700 font-medium mb-8">
+              <li class="flex items-center gap-2"><svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Özel Kaptan ve Mürettebat</li>
+              <li class="flex items-center gap-2"><svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Teknede Özel Şef & İkramlar</li>
+              <li class="flex items-center gap-2"><svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Esnek Rota ve Zamanlama</li>
+            </ul>
+            <a href={`https://wa.me/66828950665?text=${encodeURIComponent('VIP Yat kiralama hakkında bilgi almak istiyorum.')}`} target="_blank" class="inline-block border-2 border-brand-primary text-brand-primary px-8 py-3 rounded-full font-bold hover:bg-brand-primary hover:text-white transition-colors">
+              Fiyat Alın
+            </a>
+          </FadeIn>
+        </div>
+      </div>
+
+      <!-- Service 2 -->
+      <div class="flex flex-col md:flex-row-reverse gap-12 items-center">
+        <div class="md:w-1/2 w-full">
+          <FadeIn client:visible direction="left">
+            <div class="aspect-video rounded-3xl overflow-hidden shadow-xl">
+              <img src="/assets/phuket_transfer.jpg" alt="Özel Transfer" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-700" />
+            </div>
+          </FadeIn>
+        </div>
+        <div class="md:w-1/2 w-full">
+          <FadeIn client:visible delay={0.2} direction="right">
+            <h3 class="text-3xl font-serif text-brand-primary font-bold mb-4">Lüks VIP Transfer</h3>
+            <p class="text-slate-600 mb-6 leading-relaxed">
+              Havalimanı inişinizden itibaren ayrıcalığı hissetmeye başlayın. Özel şoförlü, lüks tasarımlı VIP araçlarımızla otelinize konforlu ve güvenli bir şekilde ulaşın.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-700 font-medium mb-8">
+              <li class="flex items-center gap-2"><svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Havalimanı Karşılama</li>
+              <li class="flex items-center gap-2"><svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Wi-Fi ve İkramlıklar</li>
+              <li class="flex items-center gap-2"><svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tam Gün Şoförlü Araç Kiralama Seçeneği</li>
+            </ul>
+            <a href={`https://wa.me/66828950665?text=${encodeURIComponent('VIP Transfer hakkında bilgi almak istiyorum.')}`} target="_blank" class="inline-block border-2 border-brand-primary text-brand-primary px-8 py-3 rounded-full font-bold hover:bg-brand-primary hover:text-white transition-colors">
+              Rezervasyon Yapın
+            </a>
+          </FadeIn>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</Layout>
