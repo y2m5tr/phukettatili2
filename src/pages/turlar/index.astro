@@ -2,13 +2,17 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import FadeIn from '../../components/ui/FadeIn';
-import MediaSlider from '../../components/ui/MediaSlider';
+import TourShowcase from '../../components/ui/TourShowcase';
+
 
 export const prerender = true;
 
 const tours = await getCollection('tours');
 const categoriesCollection = await getCollection('categories');
-const sortedTours = tours.sort((a, b) => a.data.order - b.data.order);
+const sortedTours = [...tours].sort((a, b) => a.data.order - b.data.order);
+const sliderTours = [...tours]
+  .sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || a.data.order - b.data.order)
+  .slice(0, 5);
 
 // Category map to Turkish labels
 const categoryMap = new Map<string, string>();
@@ -37,11 +41,7 @@ const categories = uniqueCategorySlugs.map(slug => ({
       </FadeIn>
       
       <!-- Slider -->
-      <FadeIn client:load delay={0.4} direction="up">
-        <div class="max-w-3xl mx-auto">
-          <MediaSlider client:load />
-        </div>
-      </FadeIn>
+      <TourShowcase tours={sliderTours} client:load />
     </div>
   </div>
 
