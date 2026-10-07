@@ -1,69 +1,111 @@
 ---
-/**
- * PAZARLAMA VE TAKİP KODLARI (ANALYTICS & PIXEL)
- * 
- * Sitenize Google Analytics veya Meta (Facebook) Pixel kurduğunuzda
- * size verilen ID numaralarını aşağıdaki değişkenlere yapıştırmanız yeterlidir.
- * Eğer ID boş bırakılırsa, o takip kodu çalışmayacaktır (siteyi yavaşlatmaz).
- */
-
-// 1. Google Analytics (GA4) ID'niz (Örn: "G-1234567890")
-const GOOGLE_ANALYTICS_ID = "G-40W78BJ6BD";
-
-// 2. Meta (Facebook) Pixel ID'niz (Örn: "123456789012345")
-const META_PIXEL_ID = "1413248243676873";
+const gaId = import.meta.env.PUBLIC_GA_ID || 'G-40W78BJ6BD';
+const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID || '1413248243676873';
+const hasTracking = Boolean(gaId || metaPixelId);
 ---
 
-{/* ================= GOOGLE ANALYTICS ================= */}
-{GOOGLE_ANALYTICS_ID && (
-  <>
-    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}></script>
-    <script is:inline define:vars={{ id: GOOGLE_ANALYTICS_ID }}>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', id);
+{hasTracking && (
+  <div id="tracking-consent" data-ga-id={gaId} data-meta-pixel-id={metaPixelId} class="fixed bottom-4 left-4 right-4 z-[60] mx-auto hidden max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 text-slate-800 shadow-2xl dark:border-slate-700 dark:bg-slate-900 dark:text-white" role="dialog" aria-labelledby="tracking-consent-title" aria-describedby="tracking-consent-description">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 id="tracking-consent-title" class="font-bold">Gizlilik tercihiniz</h2>
+        <p id="tracking-consent-description" class="mt-1 text-sm text-slate-600 dark:text-slate-300">Analitik ve pazarlama çerezleri yalnızca onayınızla etkinleştirilir. Tercihinizi tarayıcı verilerini temizleyerek değiştirebilirsiniz.</p>
+      </div>
+      <div class="flex shrink-0 gap-2">
+        <button id="tracking-reject" type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:hover:bg-slate-800 transition-colors">Reddet</button>
+        <button id="tracking-accept" type="button" class="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-accent transition-colors">Kabul Et</button>
+      </div>
+    </div>
+  </div>
+)}
 
-      let isFirstGaLoad = true;
-      document.addEventListener('astro:page-load', () => {
-        if (isFirstGaLoad) {
-          isFirstGaLoad = false;
-          return;
-        }
-        gtag('event', 'page_view', {
-          page_location: window.location.href,
-          page_path: window.location.pathname + window.location.search,
-          page_title: document.title
+<script>
+  declare global {
+    interface Window {
+      dataLayer: any[];
+      gtag: (...args: any[]) => void;
+      fbq: any;
+    }
+  }
+
+  const key = 'tracking-consent-v1';
+  const initialize = () => {
+    const panel = document.getElementById('tracking-consent');
+    if (!panel) return;
+
+    const load = () => {
+      const gaId = panel.dataset.gaId;
+      const pixelId = panel.dataset.metaPixelId;
+
+      if (gaId && !document.querySelector('[data-ga-loaded]')) {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+        script.dataset.gaLoaded = 'true';
+        document.head.append(script);
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = (...args: any[]) => window.dataLayer.push(args);
+        window.gtag('js', new Date());
+        window.gtag('config', gaId);
+
+        document.addEventListener('astro:page-load', () => {
+          window.gtag?.('event', 'page_view', {
+            page_location: location.href,
+            page_path: location.pathname + location.search,
+            page_title: document.title,
+          });
         });
-      });
-    </script>
-  </>
-)}
+      }
 
-{/* ================= META (FACEBOOK) PIXEL ================= */}
-{META_PIXEL_ID && (
-  <>
-    <script is:inline define:vars={{ id: META_PIXEL_ID }}>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', id);
-      fbq('track', 'PageView');
+      if (pixelId && !window.fbq) {
+        const fbq: any = (...args: any[]) => {
+          fbq.queue.push(args);
+        };
+        fbq.queue = [];
+        window.fbq = fbq;
+        window.fbq('init', pixelId);
+        window.fbq('track', 'PageView');
 
-      let isFirstFbqLoad = true;
-      document.addEventListener('astro:page-load', () => {
-        if (isFirstFbqLoad) {
-          isFirstFbqLoad = false;
-          return;
-        }
-        fbq('track', 'PageView');
-      });
-    </script>
-    <noscript><img height="1" width="1" style="display:none" src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`} /></noscript>
-  </>
-)}
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+        document.head.append(script);
+
+        document.addEventListener('astro:page-load', () => {
+          window.fbq?.('track', 'PageView');
+        });
+      }
+    };
+
+    let consent: string | null = null;
+    try {
+      consent = localStorage.getItem(key);
+    } catch {
+      /* Storage unavailable */
+    }
+
+    if (consent === 'accepted') {
+      load();
+    } else if (consent !== 'rejected') {
+      panel.classList.remove('hidden');
+    }
+
+    document.getElementById('tracking-accept')?.addEventListener('click', () => {
+      try {
+        localStorage.setItem(key, 'accepted');
+      } catch {}
+      panel.classList.add('hidden');
+      load();
+    }, { once: true });
+
+    document.getElementById('tracking-reject')?.addEventListener('click', () => {
+      try {
+        localStorage.setItem(key, 'rejected');
+      } catch {}
+      panel.classList.add('hidden');
+    }, { once: true });
+  };
+
+  document.addEventListener('astro:page-load', initialize);
+</script>
