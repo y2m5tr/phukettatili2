@@ -1,0 +1,102 @@
+---
+interface Slide {
+  src: string;
+  alt: string;
+}
+
+const slides: Slide[] = [
+  { src: '/assets/phuket_hero.jpg', alt: "Phuket Kumsalları ve Turkuaz Deniz" },
+  { src: '/assets/pileh.webp', alt: "Phi Phi Pi Leh Zümrüt Lagün" },
+  { src: '/assets/yacht.webp', alt: "Lüks VIP Yat ve Katamaran Deneyimi" },
+  { src: '/assets/longtail.webp', alt: "Geleneksel Longtail Rotaları" },
+];
+---
+
+<div id="hero-slider" class="absolute inset-0 z-0 overflow-hidden">
+  {slides.map((slide, index) => (
+    <div
+      class={`hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+        index === 0 ? 'opacity-100 z-[1]' : 'opacity-0 z-0 pointer-events-none'
+      }`}
+      data-slide-index={index}
+    >
+      <img
+        src={slide.src}
+        alt={slide.alt}
+        class={`w-full h-full object-cover ${index % 2 === 0 ? 'animate-ken-burns' : 'animate-ken-burns-alt'}`}
+        loading={index === 0 ? 'eager' : 'lazy'}
+        fetchpriority={index === 0 ? 'high' : 'auto'}
+      />
+    </div>
+  ))}
+
+  <!-- Okunurluk sağlayan yumuşak gradyan katmanı -->
+  <div class="absolute inset-0 bg-gradient-to-b from-brand-primary/80 via-brand-primary/50 to-slate-900/90 z-10 pointer-events-none"></div>
+
+  <!-- Slayt Göstergeleri (Noktalar) -->
+  <div class="absolute bottom-6 left-0 right-0 z-20 flex justify-center items-center gap-2">
+    {slides.map((_, index) => (
+      <button
+        type="button"
+        class={`hero-indicator h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+          index === 0 ? 'w-8 bg-brand-accent' : 'w-2.5 bg-white/40 hover:bg-white/80'
+        }`}
+        data-index={index}
+        aria-label={`Slayt ${index + 1}`}
+      />
+    ))}
+  </div>
+</div>
+
+<script>
+  let heroInterval: ReturnType<typeof setInterval> | null = null;
+
+  const setupHeroSlider = () => {
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      heroInterval = null;
+    }
+
+    const slider = document.getElementById('hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll<HTMLElement>('.hero-slide');
+    const indicators = slider.querySelectorAll<HTMLButtonElement>('.hero-indicator');
+    if (slides.length <= 1) return;
+
+    let currentIndex = 0;
+
+    const goToSlide = (targetIndex: number) => {
+      slides[currentIndex].classList.remove('opacity-100', 'z-[1]');
+      slides[currentIndex].classList.add('opacity-0', 'z-0', 'pointer-events-none');
+      indicators[currentIndex].classList.remove('w-8', 'bg-brand-accent');
+      indicators[currentIndex].classList.add('w-2.5', 'bg-white/40');
+
+      currentIndex = (targetIndex + slides.length) % slides.length;
+
+      slides[currentIndex].classList.remove('opacity-0', 'z-0', 'pointer-events-none');
+      slides[currentIndex].classList.add('opacity-100', 'z-[1]');
+      indicators[currentIndex].classList.remove('w-2.5', 'bg-white/40');
+      indicators[currentIndex].classList.add('w-8', 'bg-brand-accent');
+    };
+
+    const nextSlide = () => goToSlide(currentIndex + 1);
+
+    heroInterval = setInterval(nextSlide, 5000);
+
+    indicators.forEach((indicator) => {
+      indicator.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const targetIdx = Number(target.dataset.index || 0);
+        goToSlide(targetIdx);
+
+        if (heroInterval) {
+          clearInterval(heroInterval);
+          heroInterval = setInterval(nextSlide, 5000);
+        }
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', setupHeroSlider);
+</script>

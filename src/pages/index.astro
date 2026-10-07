@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import FadeIn from '../components/ui/FadeIn';
 import Accordion from '../components/ui/Accordion';
+import HeroSlider from '../components/HeroSlider.astro';
 import testimonialsData from '../content/settings/testimonials.json';
 import faqData from '../content/settings/faq.json';
 
@@ -21,14 +22,7 @@ const formattedFaqs = (faqData?.faq || []).map((item: any) => ({
 <Layout title="Ana Sayfa" description="Tayland'ın incisi Phuket'te unutulmaz bir tatil deneyimi.">
   <!-- Hero Section -->
   <section class="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-    <div class="absolute inset-0 z-0">
-      <img
-        src="/assets/phuket_hero.jpg"
-        alt="Phuket Hero Beach"
-        class="w-full h-full object-cover animate-ken-burns"
-      />
-      <div class="absolute inset-0 bg-gradient-to-b from-brand-primary/80 via-brand-primary/40 to-slate-900/90 z-10"></div>
-    </div>
+    <HeroSlider />
 
     <div class="relative z-20 text-center px-4 max-w-4xl mx-auto mt-16">
       <FadeIn client:load delay={0.2} direction="up">
