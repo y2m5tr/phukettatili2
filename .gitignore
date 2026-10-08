@@ -26,6 +26,7 @@ pnpm-debug.log*
 # Local Netlify & Vercel folders
 .netlify
 .vercel
+.claude/
 
 # Scratch scripts
 scratch/
