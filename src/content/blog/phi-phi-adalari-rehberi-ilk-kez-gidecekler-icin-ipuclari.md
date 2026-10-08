@@ -5,6 +5,7 @@ cover_image: "pileh.webp"
 date: 2026-10-07
 author: "Phuket Tatili Ekibi"
 featured: true
+related_tour: "phi-phi-maya-ve-bamboo-adasi"
 ---
 
 Tayland ve Phuket dendiğinde akla ilk gelen görsel, zümrüt yeşili lagünlerin etrafını saran dik kireçtaşı kayalıklarıyla **Phi Phi Adaları**dır. Leonardo DiCaprio’nun efsane filmi *The Beach* ile dünya çapında üne kavuşan bu adalar grubu, her yıl yüz binlerce gezgini ağırlar.
@@ -46,4 +47,4 @@ Phi Phi çok popüler bir rota olduğu için saat 10:30 ile 14:00 arasında büy
 * **Plaj havlusu ve deniz ayakkabısı:** Otelinizden plaj havlusu almayı unutmayın. Resifli alanlarda deniz ayakkabısı ayaklarınızı korur.
 * **Nakit Baht (THB):** Millî park giriş ücretleri (genellikle kişi başı 400 THB) ve teknede ekstra içecekler için nakit bulundurun.
 
-Phi Phi turu için en uygun tekne tipi ve hava koşulları hakkında bilgi almak isterseniz WhatsApp hattımızdan bize her zaman ulaşabilirsiniz.
+Phi Phi Adaları'nı konforlu bir sürat teknesi veya katamaranla gezmek, Maya Bay ve Pileh Lagünü'nü yerinde görmek isterseniz [Phi Phi, Maya ve Bamboo Adası Turu](/turlar/phi-phi-maya-ve-bamboo-adasi) programımızı inceleyebilirsiniz. En uygun tekne tipi ve hava koşulları hakkında bilgi almak için WhatsApp hattımızdan bize her zaman ulaşabilirsiniz.

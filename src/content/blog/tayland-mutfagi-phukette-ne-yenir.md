@@ -5,6 +5,7 @@ cover_image: "food.webp"
 date: 2026-10-07
 author: "Phuket Tatili Ekibi"
 featured: false
+related_tour: "phuket-sehir-ve-kultur-turu"
 ---
 
 Tayland seyahatinin en heyecan verici parçalarından biri şüphesiz eşsiz Tayland mutfağıdır. Tatlı, ekşi, tuzlu ve acının kusursuz dengesini barındıran bu mutfak, Phuket’te taze deniz ürünleri ve güney Tayland lezzetleriyle zenginleşir.
@@ -36,7 +37,9 @@ Sokak lezzetlerini hijyenik, taze ve canlı bir ortamda denemek istiyorsanız ha
 
 Tayland mutfağında standart acı seviyesi Türk damak tadına göre oldukça yüksektir. Eğer çok acı sevmiyorsanız sipariş verirken şu Tayca ifadeleri kullanabilirsiniz:
 
-* **"Mai Phet" (Acısız):** Yemeğin acı biber eklenmeden hazırlanmasını sağlar.
-* **"Phet Nit Noi" (Az Acılı):** Hafif bir baharat dokunuşu bırakır.
+* **\"Mai Phet\" (Acısız):** Yemeğin acı biber eklenmeden hazırlanmasını sağlar.
+* **\"Phet Nit Noi\" (Az Acılı):** Hafif bir baharat dokunuşu bırakır.
+
+Phuket Town'ın tarihi sokaklarını, tapınaklarını ve meşhur pazar lezzetlerini Türkçe rehberlik ve özel klimalı transfer eşliğinde keşfetmek isterseniz [Phuket Şehir ve Kültür Turu](/turlar/phuket-sehir-ve-kultur-turu) programımızı inceleyebilirsiniz.
 
 Afiyet olsun!

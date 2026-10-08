@@ -5,6 +5,7 @@ cover_image: "beachclub.webp"
 date: 2026-10-07
 author: "Phuket Tatili Ekibi"
 featured: false
+related_tour: "phuket-sehir-ve-kultur-turu"
 ---
 
 Tayland’ın en büyük adası olan Phuket, 30’dan fazla büyüleyici plaja ev sahipliği yapar. Ancak her plajın ve bölgenin karakteri birbirinden tamamen farklıdır. Yanlış bölgede konaklamak veya gününüzü yanlış plaja ayırmak tatilinizin ritmini doğrudan etkileyebilir.
@@ -45,4 +46,4 @@ Phuket’in en güney ucunda yer alan **Nai Harn**, yerel halkın ve adada uzun 
 * Yanı başındaki **Yanui Plajı** kano kiralamak ve şnorkel yapmak için adanın en berrak noktalarındandır.
 * Gün batımı için hemen yukarıdaki **Promthep Cape** seyir noktası mutlaka ziyaret edilmelidir.
 
-Otel veya villa rezervasyonunuzu yapmadan önce bölge ve ulaşım olanakları hakkında danışmak isterseniz bize dilediğiniz an WhatsApp üzerinden ulaşabilirsiniz.
+Phuket'in en güzel seyir noktalarını, Big Buddha heykelini ve tarihi Old Town caddelerini konforlu özel araçla gezmek isterseniz [Phuket Şehir ve Kültür Turu](/turlar/phuket-sehir-ve-kultur-turu) programımıza göz atabilirsiniz. Otel veya villa rezervasyonunuzu yapmadan önce bölge ve ulaşım olanakları hakkında danışmak isterseniz bize dilediğiniz an WhatsApp üzerinden ulaşabilirsiniz.

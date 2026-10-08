@@ -91,6 +91,7 @@ const blogCollection = defineCollection({
     date: z.any().optional(),
     author: z.string().optional(),
     featured: z.boolean().default(false),
+    related_tour: z.string().optional(),
   }),
 });
 

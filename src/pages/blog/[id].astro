@@ -2,19 +2,50 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import FadeIn from '../../components/ui/FadeIn';
+import BlogRelatedTour from '../../components/BlogRelatedTour.astro';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
+  const tours = await getCollection('tours');
   return posts.map((post: any) => ({
     params: { id: post.id },
-    props: { post },
+    props: { post, allTours: tours },
   }));
 }
 
-const { post } = Astro.props;
+const { post, allTours } = Astro.props;
 const { Content } = await render(post);
+
+// Default tour and badge mapping by blog post ID
+const tourMapping: Record<string, { tourId: string; badge: string }> = {
+  'phi-phi-adalari-rehberi-ilk-kez-gidecekler-icin-ipuclari': {
+    tourId: 'phi-phi-maya-ve-bamboo-adasi',
+    badge: 'Popüler Phi Phi Turunu İnceleyin',
+  },
+  'phuket-etik-fil-koruma-alanlari-rehberi': {
+    tourId: 'fil-besleme-ve-bakim-deneyimi',
+    badge: 'Etik Fil Bakım Deneyimi Turu',
+  },
+  'phuket-en-iyi-plajlar-ve-bolge-rehberi': {
+    tourId: 'phuket-sehir-ve-kultur-turu',
+    badge: 'Phuket Şehir ve Manzara Turu',
+  },
+  'phukette-kasim-ayi-hava-durumu': {
+    tourId: 'similan-adalari-surat-teknesi-turu',
+    badge: 'Yalnızca Yüksek Sezonda Açık: Similan Turu',
+  },
+  'tayland-mutfagi-phukette-ne-yenir': {
+    tourId: 'phuket-sehir-ve-kultur-turu',
+    badge: 'Kültür ve Lezzet Turu',
+  },
+};
+
+const mapping = tourMapping[post.id];
+const targetTourId = post.data.related_tour || mapping?.tourId || 'phi-phi-maya-ve-bamboo-adasi';
+const relatedTour = allTours?.find((t: any) => t.id === targetTourId) || null;
+const badgeText = mapping?.badge || 'Rehberde Bahsedilen Öne Çıkan Rota';
 ---
 
 <Layout
@@ -57,6 +88,10 @@ const { Content } = await render(post);
       <article class="prose prose-lg prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-brand-primary dark:prose-headings:text-white prose-a:text-brand-accent hover:prose-a:underline max-w-none">
         <Content />
       </article>
+
+      {relatedTour && (
+        <BlogRelatedTour tour={relatedTour} badgeText={badgeText} />
+      )}
 
       <div class="mt-16 pt-8 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
         <a href="/blog" class="text-brand-accent font-bold hover:underline">
