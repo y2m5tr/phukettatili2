@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
+import vercel from '@astrojs/vercel';
 
 import keystatic from '@keystatic/astro';
 import markdoc from '@astrojs/markdoc';
@@ -14,13 +15,14 @@ const isDev = process.argv.includes('dev');
 export default defineConfig({
   site: 'https://phukettatili.com',
   output: 'static',
+  adapter: vercel(),
   trailingSlash: 'always',
   vite: {
     plugins: [tailwindcss()]
   },
   integrations: [
     react(),
-    ...(isDev ? [keystatic()] : []),
+    keystatic(),
     markdoc(),
     sitemap({
       i18n: {
