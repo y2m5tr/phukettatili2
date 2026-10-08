@@ -9,8 +9,6 @@ import vercel from '@astrojs/vercel';
 import keystatic from '@keystatic/astro';
 import markdoc from '@astrojs/markdoc';
 
-const isDev = process.argv.includes('dev');
-
 // https://astro.build/config
 export default defineConfig({
   site: 'https://phukettatili.com',
