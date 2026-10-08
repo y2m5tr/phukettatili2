@@ -1,7 +1,10 @@
 ---
-// 6-7 saniyelik flat-design SVG/CSS çizgi film introsu.
+// ~8 saniyelik flat-design SVG/CSS çizgi film introsu (6 sahne):
+// uçak inişi → VIP transfer → fil koruma alanı → plaj/longtail → gün batımında yat → marka.
 // Bir kez oynar, sonra kaybolup mevcut HeroSlider + başlık + CTA'ları ortaya çıkarır.
 // prefers-reduced-motion açıksa hiç oynamaz; JS olmadan da CSS ile kendini gizler.
+// Sahne pencereleri: s1 0-1400, s2 1250-2650, s3 2500-3900, s4 3750-5150, s5 5000-6350, s6 6100+.
+// Sahne içi hareket animasyonları (uçak, van, fil, tekneler) kendi sahnesinin delay'iyle senkron olmalı.
 ---
 
 <div id="hero-intro" class="hero-intro" aria-hidden="true">
@@ -24,6 +27,9 @@
       </radialGradient>
       <linearGradient id="hi-sand" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#fde68a" /><stop offset="100%" stop-color="#fcd34d" />
+      </linearGradient>
+      <linearGradient id="hi-jungle" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fef9c3" /><stop offset="60%" stop-color="#d9f99d" /><stop offset="100%" stop-color="#bbf7d0" />
       </linearGradient>
     </defs>
 
@@ -93,8 +99,79 @@
       </g>
     </g>
 
-    <!-- ============ SCENE 3 : PLAJ & LONGTAIL ============ -->
+    <!-- ============ SCENE 3 : FİL KORUMA ALANI ============ -->
     <g class="scene s3">
+      <rect width="1200" height="675" fill="url(#hi-jungle)" />
+      <!-- yağmur ormanı tacı -->
+      <g fill="#166534"><circle cx="80" cy="40" r="90" /><circle cx="240" cy="20" r="100" /><circle cx="420" cy="50" r="95" /><circle cx="600" cy="15" r="105" /><circle cx="790" cy="45" r="95" /><circle cx="960" cy="10" r="100" /><circle cx="1130" cy="50" r="90" /></g>
+      <g fill="#15803d" opacity="0.9"><circle cx="160" cy="95" r="70" /><circle cx="330" cy="110" r="65" /><circle cx="520" cy="100" r="72" /><circle cx="700" cy="115" r="66" /><circle cx="880" cy="100" r="72" /><circle cx="1060" cy="112" r="66" /></g>
+      <circle cx="980" cy="200" r="60" fill="#fef9c3" opacity="0.55" />
+      <!-- tepeler ve çayır -->
+      <path d="M0 430 Q200 340 420 420 T840 410 T1200 430 L1200 675 L0 675 Z" fill="#86efac" />
+      <path d="M0 520 Q300 490 640 510 T1200 505 L1200 675 L0 675 Z" fill="#4ade80" />
+      <!-- kelebek (konum CSS keyframe'lerinde) -->
+      <g class="butterfly">
+        <g class="wings"><ellipse cx="-10" cy="0" rx="12" ry="8" fill="#f472b6" /><ellipse cx="10" cy="0" rx="12" ry="8" fill="#fb7185" /></g>
+        <rect x="-1.5" y="-7" width="3" height="14" rx="1.5" fill="#0f172a" />
+      </g>
+      <!-- yavru fil -->
+      <g class="baby-bob">
+        <g transform="translate(250,470) scale(0.45)">
+          <rect x="30" y="150" width="30" height="66" rx="14" fill="#64748b" /><rect x="110" y="150" width="30" height="66" rx="14" fill="#64748b" />
+          <ellipse cx="100" cy="110" rx="85" ry="60" fill="#94a3b8" />
+          <circle cx="185" cy="90" r="46" fill="#94a3b8" />
+          <ellipse cx="172" cy="88" rx="28" ry="34" fill="#64748b" />
+          <circle cx="200" cy="78" r="5" fill="#0f172a" />
+          <path d="M218 110 q22 20 14 52" stroke="#94a3b8" stroke-width="20" fill="none" stroke-linecap="round" />
+        </g>
+      </g>
+      <!-- rehber: muz ikram ediyor (tur: besleme deneyimi) -->
+      <g class="keeper">
+        <g transform="translate(960,410)">
+        <g transform="scale(-1,1)">
+          <rect x="10" y="120" width="16" height="56" rx="8" fill="#78350f" /><rect x="38" y="120" width="16" height="56" rx="8" fill="#78350f" />
+          <rect x="4" y="96" width="56" height="36" rx="10" fill="#334155" />
+          <rect x="6" y="40" width="52" height="62" rx="14" fill="#d97706" />
+          <circle cx="32" cy="22" r="18" fill="#fcd9b8" />
+          <path d="M2 16 Q32 -14 62 16 Z" fill="#f59e0b" /><rect x="-2" y="14" width="68" height="7" rx="3.5" fill="#d97706" />
+          <g class="keeper-arm">
+            <rect x="52" y="52" width="64" height="14" rx="7" fill="#d97706" />
+            <circle cx="120" cy="59" r="9" fill="#fcd9b8" />
+            <path d="M118 44 q22 -8 34 10 q-20 -6 -34 -4 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5" />
+            <path d="M120 56 q22 -4 30 14 q-18 -8 -30 -8 Z" fill="#fde047" stroke="#ca8a04" stroke-width="1.5" />
+          </g>
+        </g>
+        </g>
+      </g>
+      <!-- fil: eyersiz, etik koruma alanı -->
+      <g class="elephant-walk">
+        <g class="elephant-bob">
+          <g transform="translate(620,320)">
+            <path d="M8 96 q-22 10 -18 44" stroke="#64748b" stroke-width="8" fill="none" stroke-linecap="round" />
+            <rect x="30" y="140" width="34" height="76" rx="16" fill="#64748b" /><rect x="120" y="140" width="34" height="76" rx="16" fill="#64748b" />
+            <ellipse cx="105" cy="105" rx="100" ry="72" fill="#94a3b8" />
+            <rect x="55" y="150" width="34" height="70" rx="16" fill="#94a3b8" /><rect x="145" y="150" width="34" height="70" rx="16" fill="#94a3b8" />
+            <g fill="#e2e8f0"><circle cx="64" cy="214" r="4" /><circle cx="76" cy="216" r="4" /><circle cx="154" cy="214" r="4" /><circle cx="166" cy="216" r="4" /></g>
+            <circle cx="205" cy="90" r="56" fill="#94a3b8" />
+            <g class="elephant-ear"><ellipse cx="192" cy="86" rx="36" ry="44" fill="#64748b" /></g>
+            <circle cx="222" cy="76" r="5.5" fill="#0f172a" /><circle cx="224" cy="74" r="2" fill="#f8fafc" />
+            <path d="M222 122 q16 14 12 30" stroke="#f8fafc" stroke-width="9" fill="none" stroke-linecap="round" />
+            <g class="elephant-trunk">
+              <path d="M240 108 q34 18 30 66 q-3 40 -34 44 q-24 3 -26 -16" stroke="#94a3b8" stroke-width="26" fill="none" stroke-linecap="round" />
+            </g>
+          </g>
+        </g>
+      </g>
+      <!-- ön plan otları -->
+      <g stroke="#16a34a" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.8">
+        <path d="M120 620 q6 -22 2 -34" /><path d="M132 620 q2 -24 10 -32" />
+        <path d="M980 640 q6 -22 2 -34" /><path d="M992 640 q2 -24 10 -32" />
+        <path d="M520 655 q6 -22 2 -34" /><path d="M532 655 q2 -24 10 -32" />
+      </g>
+    </g>
+
+    <!-- ============ SCENE 4 : PLAJ & LONGTAIL ============ -->
+    <g class="scene s4">
       <rect width="1200" height="675" fill="url(#hi-sea)" />
       <circle cx="1000" cy="120" r="48" fill="#fff7ed" opacity="0.95" />
       <!-- kireçtaşı adaları -->
@@ -126,8 +203,8 @@
       </g>
     </g>
 
-    <!-- ============ SCENE 4 : YAT & ADA TURU ============ -->
-    <g class="scene s4">
+    <!-- ============ SCENE 5 : YAT & ADA TURU ============ -->
+    <g class="scene s5">
       <rect width="1200" height="675" fill="url(#hi-gold)" />
       <circle cx="600" cy="230" r="80" fill="#fff7ed" opacity="0.9" />
       <g class="cloud c1" fill="#fde68a" opacity="0.5"><ellipse cx="260" cy="150" rx="70" ry="26" /><ellipse cx="320" cy="158" rx="48" ry="20" /></g>
@@ -156,8 +233,8 @@
       </g>
     </g>
 
-    <!-- ============ SCENE 5 : MARKA ============ -->
-    <g class="scene s5">
+    <!-- ============ SCENE 6 : MARKA ============ -->
+    <g class="scene s6">
       <rect width="1200" height="675" fill="url(#hi-brand)" />
       <circle cx="600" cy="250" r="150" fill="#d97706" opacity="0.12" />
       <g stroke="#d97706" stroke-width="3" opacity="0.25" fill="none">
@@ -178,7 +255,7 @@
   .hero-intro {
     position: absolute; inset: 0; z-index: 30; overflow: hidden;
     background: #0f172a; pointer-events: auto;
-    animation: hi-out 620ms ease forwards; animation-delay: 7000ms;
+    animation: hi-out 620ms ease forwards; animation-delay: 7200ms;
   }
   .intro-svg { width: 100%; height: 100%; display: block; }
   .scene { opacity: 0; }
@@ -187,11 +264,12 @@
   @keyframes s-fade { 0% { opacity: 0; } 10% { opacity: 1; } 84% { opacity: 1; } 100% { opacity: 0; } }
   @keyframes s-in { from { opacity: 0; } to { opacity: 1; } }
 
-  .s1 { animation: s-fade 1700ms ease forwards; animation-delay: 0ms; }
-  .s2 { animation: s-fade 1700ms ease forwards; animation-delay: 1500ms; }
-  .s3 { animation: s-fade 1700ms ease forwards; animation-delay: 3000ms; }
-  .s4 { animation: s-fade 1650ms ease forwards; animation-delay: 4500ms; }
-  .s5 { animation: s-in 900ms ease forwards; animation-delay: 5800ms; }
+  .s1 { animation: s-fade 1400ms ease forwards; animation-delay: 0ms; }
+  .s2 { animation: s-fade 1400ms ease forwards; animation-delay: 1250ms; }
+  .s3 { animation: s-fade 1400ms ease forwards; animation-delay: 2500ms; }
+  .s4 { animation: s-fade 1400ms ease forwards; animation-delay: 3750ms; }
+  .s5 { animation: s-fade 1350ms ease forwards; animation-delay: 5000ms; }
+  .s6 { animation: s-in 900ms ease forwards; animation-delay: 6100ms; }
 
   /* güneş */
   @keyframes hi-pulse { 0%,100% { transform: scale(1); opacity: .95; } 50% { transform: scale(1.06); opacity: 1; } }
@@ -206,7 +284,7 @@
 
   /* uçak inişi */
   @keyframes hi-plane { 0% { transform: translate(-320px,-150px) rotate(4deg); } 100% { transform: translate(620px,400px) rotate(0deg); } }
-  .plane { animation: hi-plane 1700ms cubic-bezier(.4,0,.6,1) forwards; }
+  .plane { transform: translate(-320px,-150px) rotate(4deg); animation: hi-plane 1400ms cubic-bezier(.4,0,.6,1) forwards; }
 
   /* pist çizgileri */
   @keyframes hi-dash { to { stroke-dashoffset: -128; } }
@@ -214,40 +292,60 @@
 
   /* VIP araç */
   @keyframes hi-van { 0% { transform: translate(-320px,440px); } 100% { transform: translate(1180px,440px); } }
-  .van { animation: hi-van 1700ms linear forwards; }
+  .van { transform: translate(-320px,440px); animation: hi-van 1400ms linear forwards; animation-delay: 1250ms; }
   @keyframes hi-wheel { to { transform: rotate(360deg); } }
   .wheel { transform-box: fill-box; transform-origin: center; animation: hi-wheel .5s linear infinite; }
   @keyframes hi-lane { to { stroke-dashoffset: -172; } }
   .lane line { animation: hi-lane .6s linear infinite; }
   @keyframes hi-palmscroll { from { transform: translateX(120px); } to { transform: translateX(-560px); } }
-  .palmset { animation: hi-palmscroll 1700ms linear forwards; }
+  .palmset { animation: hi-palmscroll 1400ms linear forwards; animation-delay: 1250ms; }
 
   /* dalgalar */
   @keyframes hi-wave { from { transform: translateX(0); } to { transform: translateX(160px); } }
   .waves { animation: hi-wave 3s linear infinite; }
 
-  /* longtail tekne (sallanma + hafif geçiş) */
+  /* fil koruma alanı (sahne 3: 2500ms) */
+  @keyframes hi-elephant { 0% { transform: translate(-260px,0); } 100% { transform: translate(40px,0); } }
+  .elephant-walk { transform: translate(-260px,0); animation: hi-elephant 1400ms ease-out forwards; animation-delay: 2500ms; }
+  @keyframes hi-elephant-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .elephant-bob { transform-box: fill-box; transform-origin: center; animation: hi-elephant-bob 1.6s ease-in-out infinite; animation-delay: 2500ms; }
+  @keyframes hi-trunk { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(9deg); } }
+  .elephant-trunk { transform-box: fill-box; transform-origin: 0% 0%; animation: hi-trunk 2.2s ease-in-out infinite; animation-delay: 2500ms; }
+  @keyframes hi-ear { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.86); } }
+  .elephant-ear { transform-box: fill-box; transform-origin: 100% 50%; animation: hi-ear 1.8s ease-in-out infinite; animation-delay: 2500ms; }
+  @keyframes hi-baby { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .baby-bob { transform-box: fill-box; transform-origin: center bottom; animation: hi-baby 1.2s ease-in-out infinite; animation-delay: 2700ms; }
+  @keyframes hi-keeper { 0% { transform: translate(320px,0); opacity: 0; } 100% { transform: translate(0,0); opacity: 1; } }
+  .keeper { transform: translate(320px,0); animation: hi-keeper 1200ms ease-out forwards; animation-delay: 2650ms; }
+  @keyframes hi-arm { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(-7deg); } }
+  .keeper-arm { transform-box: fill-box; transform-origin: 0% 50%; animation: hi-arm 1.8s ease-in-out infinite; animation-delay: 2900ms; }
+  @keyframes hi-flutter { 0% { transform: translate(520px,240px) rotate(-6deg); } 25% { transform: translate(430px,180px) rotate(8deg); } 50% { transform: translate(540px,300px) rotate(-4deg); } 75% { transform: translate(620px,200px) rotate(10deg); } 100% { transform: translate(520px,240px) rotate(-6deg); } }
+  .butterfly { transform: translate(520px,240px); animation: hi-flutter 5s ease-in-out infinite; animation-delay: 2600ms; }
+  @keyframes hi-wingbeat { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(.35); } }
+  .wings { transform-box: fill-box; transform-origin: center; animation: hi-wingbeat .3s ease-in-out infinite; }
+
+  /* longtail tekne (sallanma + hafif geçiş; sahne 4: 3750ms) */
   @keyframes hi-sail { 0% { transform: translate(180px,360px); } 100% { transform: translate(430px,360px); } }
-  .longtail-sail { animation: hi-sail 1700ms ease-in-out forwards; }
+  .longtail-sail { transform: translate(180px,360px); animation: hi-sail 1400ms ease-in-out forwards; animation-delay: 3750ms; }
   @keyframes hi-bob { 0%,100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
   .longtail-bob { transform-box: fill-box; transform-origin: center; animation: hi-bob 2.4s ease-in-out infinite; }
 
-  /* sürat teknesi */
+  /* sürat teknesi (sahne 5: 5000ms) */
   @keyframes hi-speed { 0% { transform: translate(-260px,470px); } 100% { transform: translate(820px,470px); } }
-  .speedboat { animation: hi-speed 1650ms cubic-bezier(.3,0,.7,1) forwards; }
+  .speedboat { transform: translate(-260px,470px); animation: hi-speed 1350ms cubic-bezier(.3,0,.7,1) forwards; animation-delay: 5000ms; }
   @keyframes hi-birds { from { transform: translate(-40px,0); } to { transform: translate(120px,-30px); } }
   .birds { animation: hi-birds 6s linear infinite; }
 
   /* marka */
   @keyframes hi-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-  .brand-title { opacity: 0; transform-box: fill-box; transform-origin: center; animation: hi-rise 800ms ease forwards; animation-delay: 5900ms; }
-  .brand-sub { opacity: 0; animation: hi-rise 800ms ease forwards; animation-delay: 6250ms; }
+  .brand-title { opacity: 0; transform-box: fill-box; transform-origin: center; animation: hi-rise 800ms ease forwards; animation-delay: 6200ms; }
+  .brand-sub { opacity: 0; animation: hi-rise 800ms ease forwards; animation-delay: 6550ms; }
   @keyframes hi-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-  .brand-line { transform-box: fill-box; transform-origin: center; transform: scaleX(0); animation: hi-line 700ms ease forwards; animation-delay: 6100ms; }
+  .brand-line { transform-box: fill-box; transform-origin: center; transform: scaleX(0); animation: hi-line 700ms ease forwards; animation-delay: 6400ms; }
 
   /* ilerleme çubuğu + atla */
   .intro-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.18); z-index: 40; }
-  .intro-progress-bar { display: block; height: 100%; width: 100%; background: var(--color-brand-accent); transform: scaleX(0); transform-origin: left; animation: hi-bar 7000ms linear forwards; }
+  .intro-progress-bar { display: block; height: 100%; width: 100%; background: var(--color-brand-accent); transform: scaleX(0); transform-origin: left; animation: hi-bar 7200ms linear forwards; }
   @keyframes hi-bar { to { transform: scaleX(1); } }
   .intro-skip {
     position: absolute; right: 18px; bottom: 20px; z-index: 40; cursor: pointer;
@@ -281,8 +379,8 @@
 
     intro.querySelector('[data-skip]')?.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
     intro.addEventListener('click', finish);
-    // Emniyet: CSS zaten 7.6s'de gizler; DOM'dan da temizle.
-    window.setTimeout(() => intro.remove(), 7800);
+    // Emniyet: CSS zaten 7.8s'de gizler; DOM'dan da temizle.
+    window.setTimeout(() => intro.remove(), 8000);
   };
 
   document.addEventListener('astro:page-load', setupHeroIntro);
