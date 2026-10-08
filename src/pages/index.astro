@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import FadeIn from '../components/ui/FadeIn';
 import Accordion from '../components/ui/Accordion';
 import HeroSlider from '../components/HeroSlider.astro';
+import HeroIntro from '../components/HeroIntro.astro';
 import testimonialsData from '../content/settings/testimonials.json';
 import faqData from '../content/settings/faq.json';
 import homeData from '../content/pages/home.json';
@@ -59,6 +60,7 @@ const guestMoments = [
 <Layout title="Ana Sayfa" description="Tayland'ın incisi Phuket'te unutulmaz bir tatil deneyimi.">
   <!-- Hero Section -->
   <section class="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+    <HeroIntro />
     <HeroSlider />
 
     <div class="relative z-20 text-center px-4 max-w-4xl mx-auto mt-16">
