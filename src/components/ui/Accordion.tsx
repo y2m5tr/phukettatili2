@@ -17,8 +17,12 @@ export default function Accordion({ faqs }: { faqs: FAQ[] }) {
           className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors"
         >
           <button
+            id={`faq-trigger-${index}`}
+            type="button"
+            aria-expanded={openIndex === index}
+            aria-controls={`faq-panel-${index}`}
             onClick={() => setOpenIndex(openIndex === index ? null : index)}
-            className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none group"
+            className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-accent group"
           >
             <span className="font-bold text-lg text-brand-primary dark:text-slate-200 group-hover:text-brand-accent transition-colors">
               {faq.q}
@@ -36,6 +40,9 @@ export default function Accordion({ faqs }: { faqs: FAQ[] }) {
           <AnimatePresence>
             {openIndex === index && (
               <motion.div
+                id={`faq-panel-${index}`}
+                role="region"
+                aria-labelledby={`faq-trigger-${index}`}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}

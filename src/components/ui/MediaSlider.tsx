@@ -39,7 +39,9 @@ export default function MediaSlider() {
           {mediaList[currentIndex].type === 'image' ? (
             <img
               src={mediaList[currentIndex].src}
-              alt="Phuket Snapshot"
+              alt={`Phuket Snapshot ${currentIndex + 1}`}
+              loading={currentIndex === 0 ? 'eager' : 'lazy'}
+              decoding="async"
               className="w-full h-full object-cover"
             />
           ) : (
@@ -59,10 +61,13 @@ export default function MediaSlider() {
       {/* Progress Dots */}
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
         {mediaList.map((_, i) => (
-          <div
+          <button
             key={i}
+            type="button"
+            aria-label={`Medya ${i + 1}`}
+            aria-current={i === currentIndex ? 'true' : undefined}
             onClick={() => setCurrentIndex(i)}
-            className={`w-2.5 h-2.5 rounded-full cursor-pointer transition-all ${
+            className={`w-2.5 h-2.5 rounded-full cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
               i === currentIndex ? 'bg-brand-accent w-6' : 'bg-white/50 hover:bg-white'
             }`}
           />

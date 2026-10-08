@@ -37,10 +37,10 @@ const formattedFaqs = (faqData?.faq || []).map((item: any) => ({
       </FadeIn>
       <FadeIn client:load delay={0.6} direction="up">
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/turlar" class="bg-brand-accent hover:bg-brand-accent/90 text-white px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
+          <a href="/turlar" class="premium-cta bg-brand-accent hover:bg-brand-accent/90 text-white px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
             Turları İncele
           </a>
-          <a href="https://wa.me/66828950665" target="_blank" class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
+          <a href="https://wa.me/66828950665" target="_blank" class="premium-cta bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
             WhatsApp'tan Ulaşın
           </a>
         </div>
@@ -61,11 +61,13 @@ const formattedFaqs = (faqData?.faq || []).map((item: any) => ({
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         {featuredTours.length > 0 ? featuredTours.map((tour: any, index: number) => (
           <FadeIn client:visible delay={0.2 + (index * 0.15)} direction="up">
-            <a href={`/turlar/${tour.id}`} class="group block rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
+            <a href={`/turlar/${tour.id}`} class="premium-card group block rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
               <div class="relative h-64 overflow-hidden">
                 <img 
                   src={`/assets/${tour.data.image}`} 
                   alt={tour.data.title}
+                  loading="lazy"
+                  decoding="async"
                   class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
                 <div class="absolute inset-0 bg-brand-primary/20 group-hover:bg-transparent transition-colors duration-500"></div>

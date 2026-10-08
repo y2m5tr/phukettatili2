@@ -130,3 +130,120 @@
 .animate-ken-burns-alt {
   animation: ken-burns-alt 20s ease-in-out infinite alternate;
 }
+
+/* Mobile navigation and scroll depth */
+#site-header.is-scrolled {
+  box-shadow: 0 12px 30px -22px rgba(15, 23, 42, .7);
+  background-color: rgba(255, 255, 255, .96);
+}
+
+.dark #site-header.is-scrolled {
+  background-color: rgba(10, 15, 26, .98);
+}
+
+.mobile-menu {
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+@media (max-width: 767px) {
+  .mobile-booking-cta {
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  body:has(.mobile-booking-cta) .premium-whatsapp {
+    display: none !important;
+  }
+}
+
+.mobile-menu.is-open {
+  animation: mobile-menu-in .3s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+@keyframes mobile-menu-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Premium micro-interactions */
+@keyframes soft-pulse {
+  0%, 100% { box-shadow: 0 10px 30px -10px rgba(37, 211, 102, .35); }
+  50% { box-shadow: 0 14px 38px -8px rgba(37, 211, 102, .6); }
+}
+
+@keyframes button-shine {
+  0% { transform: translateX(-130%) skewX(-18deg); }
+  55%, 100% { transform: translateX(180%) skewX(-18deg); }
+}
+
+.premium-card {
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: transform .5s cubic-bezier(.22, .61, .36, 1), box-shadow .5s cubic-bezier(.22, .61, .36, 1), border-color .5s ease;
+}
+
+.premium-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.18) 48%, transparent 70%);
+  transform: translateX(-130%) skewX(-18deg);
+  transition: transform .2s ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 50px -22px rgba(15, 23, 42, .55);
+}
+
+.premium-card:hover::after {
+  animation: button-shine .9s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+.premium-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.premium-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  pointer-events: none;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+  transform: translateX(-180%) skewX(-18deg);
+}
+
+.premium-cta:hover::after {
+  animation: button-shine .8s ease both;
+}
+
+.premium-whatsapp {
+  animation: soft-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-card,
+  .premium-cta,
+  .premium-whatsapp {
+    animation: none;
+    transition: none;
+  }
+
+  .premium-card:hover {
+    transform: none;
+  }
+
+  .mobile-menu.is-open {
+    animation: none;
+  }
+
+  .premium-card:hover::after,
+  .premium-cta:hover::after {
+    animation: none;
+  }
+}

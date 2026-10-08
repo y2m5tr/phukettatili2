@@ -39,6 +39,8 @@ const sortedPosts = posts.sort((a: any, b: any) => {
                   <img
                     src={post.data.cover_image ? `/assets/${post.data.cover_image}` : '/assets/beach.webp'}
                     alt={post.data.title}
+                    loading="lazy"
+                    decoding="async"
                     class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                   />
                   <div class="absolute inset-0 bg-brand-primary/20 group-hover:bg-transparent transition-colors duration-500"></div>

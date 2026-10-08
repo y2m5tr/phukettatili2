@@ -24,6 +24,9 @@ const { Content } = await render(tour);
       <img
         src={`/assets/${tour.data.image}`}
         alt={tour.data.title}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
         class="w-full h-full object-cover animate-ken-burns"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-[#0a0f1a]/50 to-transparent z-10"></div>
@@ -57,7 +60,7 @@ const { Content } = await render(tour);
   </section>
 
   <!-- Content Section -->
-  <section class="py-16 bg-slate-50 dark:bg-[#0a0f1a]">
+  <section class="py-16 pb-32 bg-slate-50 dark:bg-[#0a0f1a]">
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-12">
       <!-- Main Content -->
       <div class="lg:col-span-2 prose prose-lg prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-brand-primary dark:prose-headings:text-white prose-a:text-brand-accent hover:prose-a:text-brand-primary max-w-none">
@@ -153,6 +156,13 @@ const { Content } = await render(tour);
           ) : null}
         </div>
       </div>
+      <a
+        href={`https://wa.me/66828950665?text=${encodeURIComponent(`Merhaba, ${tour.data.title} turu hakkında bilgi almak istiyorum.`)}`}
+        target="_blank"
+        class="mobile-booking-cta premium-cta fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-4 font-bold text-white shadow-2xl shadow-green-900/30 md:hidden"
+      >
+        WhatsApp'tan hemen bilgi al
+      </a>
     </div>
   </section>
 </Layout>

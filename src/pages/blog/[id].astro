@@ -28,6 +28,9 @@ const { Content } = await render(post);
       <img
         src={post.data.cover_image ? `/assets/${post.data.cover_image}` : '/assets/beach.webp'}
         alt={post.data.title}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
         class="w-full h-full object-cover animate-ken-burns"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-[#0a0f1a]/60 to-transparent z-10"></div>

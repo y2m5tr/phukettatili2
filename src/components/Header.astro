@@ -1,11 +1,11 @@
 ---
 ---
-<header class="fixed w-full top-0 z-50 transition-all duration-500 bg-white/90 dark:bg-[#0a0f1a]/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/80 shadow-sm">
+<header id="site-header" class="fixed w-full top-0 z-50 transition-all duration-500 bg-white/90 dark:bg-[#0a0f1a]/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/80 shadow-sm">
   <div class="max-w-7xl mx-auto px-6">
     <div class="flex items-center justify-between h-24">
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2.5 shrink-0 group mr-8 lg:mr-12 xl:mr-16">
-        <img src="/assets/logo-main-transparent.png" alt="Phuket Tatili Logo" class="h-14 lg:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
+        <img src="/assets/logo-main-transparent.png" alt="Phuket Tatili Logo" width="460" height="340" decoding="async" class="h-14 lg:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
         <span class="font-serif text-2xl lg:text-3xl font-bold text-brand-primary dark:text-white tracking-tight whitespace-nowrap">Phuket <span class="text-brand-accent italic">Tatili</span></span>
       </a>
 
@@ -35,14 +35,14 @@
       </nav>
 
       <!-- Mobile Menu Button -->
-      <button id="mobile-menu-btn" class="md:hidden p-2 text-brand-primary dark:text-white focus:outline-none" aria-label="Menüyü Aç">
+      <button id="mobile-menu-btn" class="md:hidden rounded-xl p-3 text-brand-primary dark:text-white transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent" aria-label="Menüyü Aç" aria-expanded="false" aria-controls="mobile-menu">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
     </div>
   </div>
 
   <!-- Mobile Navigation -->
-  <div id="mobile-menu" class="fixed inset-0 bg-white dark:bg-[#0a0f1a] z-40 hidden flex-col pt-24 px-6 gap-6 text-xl">
+  <div id="mobile-menu" class="mobile-menu fixed inset-0 bg-white dark:bg-[#0a0f1a] z-40 hidden flex-col pt-24 px-6 gap-6 text-xl" aria-hidden="true">
     <a href="/" class="text-brand-primary dark:text-white font-bold hover:text-brand-accent transition-colors">Ana Sayfa</a>
     <a href="/turlar" class="text-brand-primary dark:text-white font-bold hover:text-brand-accent transition-colors">Turlar</a>
     <a href="/vip" class="text-brand-primary dark:text-white font-bold hover:text-brand-accent transition-colors">VIP Hizmetler</a>
@@ -66,27 +66,34 @@
     const menu = document.getElementById('mobile-menu');
 
     if (btn && menu && closeBtn) {
-      btn.onclick = () => {
-        menu.classList.remove('hidden');
-        menu.classList.add('flex');
-        document.body.style.overflow = 'hidden';
+      const setMenuState = (open: boolean) => {
+        menu.classList.toggle('hidden', !open);
+        menu.classList.toggle('flex', open);
+        menu.classList.toggle('is-open', open);
+        menu.setAttribute('aria-hidden', String(!open));
+        btn.setAttribute('aria-expanded', String(open));
+        document.body.style.overflow = open ? 'hidden' : '';
+        if (open) closeBtn.focus();
       };
 
-      closeBtn.onclick = () => {
-        menu.classList.add('hidden');
-        menu.classList.remove('flex');
-        document.body.style.overflow = '';
-      };
+      btn.onclick = () => setMenuState(true);
+      closeBtn.onclick = () => setMenuState(false);
 
-      // Close menu on link click
       menu.querySelectorAll('a').forEach(link => {
-        link.onclick = () => {
-          menu.classList.add('hidden');
-          menu.classList.remove('flex');
-          document.body.style.overflow = '';
-        };
+        link.addEventListener('click', () => setMenuState(false));
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && menu.classList.contains('is-open')) setMenuState(false);
       });
     }
+
+    const header = document.getElementById('site-header');
+    const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 12);
+    updateHeader();
+    window.removeEventListener('scroll', (window as any)._onHeaderScroll);
+    (window as any)._onHeaderScroll = updateHeader;
+    window.addEventListener('scroll', updateHeader, { passive: true });
 
     // Theme Toggle Logic
     const themeToggleBtn = document.getElementById('theme-toggle');
