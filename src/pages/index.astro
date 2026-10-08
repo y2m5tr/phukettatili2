@@ -6,6 +6,8 @@ import Accordion from '../components/ui/Accordion';
 import HeroSlider from '../components/HeroSlider.astro';
 import testimonialsData from '../content/settings/testimonials.json';
 import faqData from '../content/settings/faq.json';
+import homeData from '../content/pages/home.json';
+import siteSettings from '../content/settings/site.json';
 
 export const prerender = true;
 
@@ -17,6 +19,7 @@ const formattedFaqs = (faqData?.faq || []).map((item: any) => ({
   q: item.question,
   a: item.answer,
 }));
+const waUrl = `https://wa.me/${siteSettings?.whatsappNumber || '66828950665'}`;
 ---
 
 <Layout title="Ana Sayfa" description="Tayland'ın incisi Phuket'te unutulmaz bir tatil deneyimi.">
@@ -27,12 +30,12 @@ const formattedFaqs = (faqData?.faq || []).map((item: any) => ({
     <div class="relative z-20 text-center px-4 max-w-4xl mx-auto mt-16">
       <FadeIn client:load delay={0.2} direction="up">
         <h1 class="text-5xl md:text-7xl text-white mb-6 drop-shadow-lg leading-tight">
-          Phuket'in <span class="text-brand-accent italic">Büyüsünü</span> Keşfedin
+          {homeData?.heroTitle || "Phuket'in Büyüsünü Keşfedin"}
         </h1>
       </FadeIn>
       <FadeIn client:load delay={0.4} direction="up">
         <p class="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto font-light">
-          Size özel tasarlanmış turlar, gizli kalmış cennet koylar ve unutulmaz anılar için en doğru yerdesiniz.
+          {homeData?.heroSubtitle || "Size özel tasarlanmış turlar, gizli kalmış cennet koylar ve unutulmaz anılar için en doğru yerdesiniz."}
         </p>
       </FadeIn>
       <FadeIn client:load delay={0.6} direction="up">
@@ -40,7 +43,7 @@ const formattedFaqs = (faqData?.faq || []).map((item: any) => ({
           <a href="/turlar" class="premium-cta bg-brand-accent hover:bg-brand-accent/90 text-white px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
             Turları İncele
           </a>
-          <a href="https://wa.me/66828950665" target="_blank" class="premium-cta bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
+          <a href={waUrl} target="_blank" class="premium-cta bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-medium transition-all transform hover:scale-105 shadow-xl">
             WhatsApp'tan Ulaşın
           </a>
         </div>
