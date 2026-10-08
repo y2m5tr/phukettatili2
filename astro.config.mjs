@@ -16,7 +16,7 @@ export default defineConfig({
   site: 'https://phukettatili.com',
   output: 'static',
   adapter: vercel(),
-  trailingSlash: 'always',
+  trailingSlash: 'ignore',
   vite: {
     plugins: [tailwindcss()]
   },
