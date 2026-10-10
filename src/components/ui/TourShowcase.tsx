@@ -34,7 +34,7 @@ export default function TourShowcase({ tours }: { tours: TourSlide[] }) {
   };
 
   return (
-    <section className="tour-showcase group relative mx-auto mt-10 w-full max-w-7xl overflow-hidden rounded-[1.75rem] border border-white/20 bg-[#07111d] text-left shadow-[0_35px_100px_-35px_rgba(0,0,0,.85)] md:rounded-[2.25rem]"
+    <section className="tour-showcase group relative mx-auto mt-10 w-full max-w-7xl overflow-hidden rounded-[1.75rem] border border-white/20 bg-surface-1 text-left shadow-[0_35px_100px_-35px_rgba(0,0,0,.85)] md:rounded-[2.25rem]"
       aria-label="Öne çıkan Phuket turları"
       onTouchStart={(event) => { touchStart.current = event.touches[0]?.clientX ?? null; }}
       onTouchEnd={(event) => {

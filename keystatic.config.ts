@@ -77,6 +77,7 @@ export default config({
         title: fields.slug({ name: { label: 'Başlık' } }),
         excerpt: fields.text({ label: 'Kısa Özet', multiline: true }),
         cover_image: fields.text({ label: 'Kapak Görseli (Örn: beach.webp)' }),
+        date: fields.date({ label: 'Yayın Tarihi' }),
         author: fields.text({ label: 'Yazar', defaultValue: 'Phuket Tatili Ekibi' }),
         featured: fields.checkbox({ label: 'Öne Çıkarılan Yazı mı?', defaultValue: false }),
         related_tour: fields.text({ label: 'İlgili Tur ID (Örn: phi-phi-maya-ve-bamboo-adasi)' }),

@@ -8,7 +8,7 @@ export const prerender = true;
 <Layout title="Hakkımızda" description="Phuket Tatili ekibi olarak amacımız size Tayland'da unutulmaz anılar yaşatmak.">
   <div class="bg-brand-primary text-white py-24 px-4 relative overflow-hidden">
     <div class="absolute inset-0 opacity-30 z-0">
-      <img src="/assets/phuket_culture.jpg" alt="Phuket Culture" class="w-full h-full object-cover animate-ken-burns" />
+      <img src="/assets/phuket_culture.webp" alt="Phuket Culture" class="w-full h-full object-cover animate-ken-burns" />
     </div>
     <div class="relative max-w-4xl mx-auto text-center z-10">
       <FadeIn client:load direction="up">
@@ -22,7 +22,7 @@ export const prerender = true;
     </div>
   </div>
 
-  <section class="py-24 bg-slate-50 dark:bg-[#0a0f1a] px-4">
+  <section class="py-24 bg-slate-50 dark:bg-surface-1 px-4">
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
       <FadeIn client:visible direction="right">
         <h2 class="text-3xl md:text-4xl font-serif text-brand-primary dark:text-white font-bold mb-6">Hayallerinizdeki Tatil İçin Buradayız</h2>
@@ -37,11 +37,15 @@ export const prerender = true;
         
         <div class="mt-10 grid grid-cols-2 gap-8">
           <div>
-            <h4 class="text-4xl font-bold text-brand-accent mb-2">10+</h4>
+            <h4 class="text-4xl font-bold text-brand-accent mb-2">
+              <span class="stat-count" data-target="10" data-suffix="+">10+</span>
+            </h4>
             <p class="text-slate-500 dark:text-slate-400">Yıllık Tecrübe</p>
           </div>
           <div>
-            <h4 class="text-4xl font-bold text-brand-accent mb-2">5000+</h4>
+            <h4 class="text-4xl font-bold text-brand-accent mb-2">
+              <span class="stat-count" data-target="5000" data-suffix="+">5000+</span>
+            </h4>
             <p class="text-slate-500 dark:text-slate-400">Mutlu Misafir</p>
           </div>
         </div>
@@ -50,7 +54,7 @@ export const prerender = true;
       <FadeIn client:visible delay={0.3} direction="left">
         <div class="relative">
           <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-            <img src="/assets/phuket_hero.jpg" alt="Phuket Vacation" class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" />
+            <img src="/assets/phuket_hero.webp" alt="Phuket Vacation" class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" />
           </div>
           <div class="absolute -bottom-8 -left-8 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl max-w-xs hidden md:block border border-slate-100 dark:border-slate-700">
             <p class="font-serif text-xl text-brand-primary dark:text-white italic">"Mükemmel bir tatil, kusursuz bir planlamayla başlar."</p>
@@ -60,3 +64,38 @@ export const prerender = true;
     </div>
   </section>
 </Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const stats = Array.from(document.querySelectorAll<HTMLElement>('.stat-count'));
+    if (stats.length === 0) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const animate = (el: HTMLElement) => {
+      const target = parseInt(el.dataset.target || '0', 10);
+      const suffix = el.dataset.suffix || '';
+      if (reduce) { el.textContent = target.toLocaleString('tr-TR') + suffix; return; }
+      const dur = 1600;
+      const start = performance.now();
+      const step = (now: number) => {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+        el.textContent = Math.round(target * eased).toLocaleString('tr-TR') + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animate(entry.target as HTMLElement);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    stats.forEach((el) => io.observe(el));
+  });
+</script>

@@ -1,0 +1,29 @@
+---
+import FadeIn from '../ui/FadeIn';
+import Accordion from '../ui/Accordion';
+
+interface FaqItem {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  faqs: FaqItem[];
+}
+
+const { faqs } = Astro.props;
+---
+
+{faqs && faqs.length > 0 && (
+  <section class="py-24 bg-white dark:bg-surface-2 px-4">
+    <div class="max-w-4xl mx-auto">
+      <FadeIn client:visible delay={0.1}>
+        <div class="text-center mb-16">
+          <span class="text-xs uppercase tracking-widest text-brand-accent font-bold">Merak Edilenler</span>
+          <h2 class="text-3xl md:text-5xl text-brand-primary dark:text-white font-serif font-bold mt-2">Sıkça Sorulan Sorular</h2>
+        </div>
+      </FadeIn>
+      <Accordion client:visible faqs={faqs} />
+    </div>
+  </section>
+)}

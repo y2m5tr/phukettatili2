@@ -6,15 +6,38 @@
   --font-sans: "DM Sans", sans-serif;
   --font-serif: "Playfair Display", serif;
   --color-brand-primary: #0f172a;
-  --color-brand-accent: #d97706;
+
+  /* Vurgu rengi üç role ayrıldı — tek ton hem koyu yüzeyde metin hem de
+     beyaz metin taşıyan dolgu olarak AA sınırını geçemiyordu:
+     brand-amber: koyu kehribar; beyaz zeminde metin (5.0:1) ve beyaz metinli
+       dolgular (5.0:1). Moddan bağımsız sabittir.
+     brand-gold: parlak altın; her zaman koyu olan yüzeylerde (footer, hero,
+       kart görselleri) metin/vurgu. #0a0f1a üzerinde 11.4:1.
+     brand-accent: semantik token — açık modda amber, dark modda gold.
+       Yalnızca açık/koyu arka planı olan bölümlerde kullan. */
+  --color-brand-amber: #b45309;
+  --color-brand-gold: #fbbf24;
+  --color-brand-accent: #b45309;
+
+  /* Dark mod yüzey kademeleri */
+  --color-surface-1: #0a0f1a;
+  --color-surface-2: #0f172a;
+  --color-surface-3: #1e293b;
+}
+
+/* Semantik token: açık/koyu geçişli bölümlerdeki vurgu metni dark modda
+   parlak altına döner. Daima koyu yüzeyler brand-gold, beyaz metinli dolgular
+   brand-amber kullanır — bunlar bu geçişten etkilenmez. */
+.dark {
+  --color-brand-accent: var(--color-brand-gold);
 }
 
 @layer base {
   body {
-    @apply text-slate-800 bg-slate-50 antialiased font-sans selection:bg-brand-accent selection:text-white transition-colors duration-500;
+    @apply text-slate-800 bg-slate-50 antialiased font-sans selection:bg-brand-amber selection:text-white transition-colors duration-500;
   }
   .dark body {
-    @apply text-slate-200 bg-[#0a0f1a] selection:bg-[#f59e0b] selection:text-[#0a0f1a];
+    @apply text-slate-200 bg-surface-1 selection:bg-brand-gold selection:text-surface-1;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -226,10 +249,82 @@
   animation: soft-pulse 3s ease-in-out infinite;
 }
 
+/* ---- Sayfa üstü okuma/ilerleme çubuğu ---- */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px; width: 100%;
+  z-index: 60;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--color-brand-amber), var(--color-brand-gold));
+  box-shadow: 0 0 12px -2px rgba(251, 191, 36, .6);
+  pointer-events: none;
+}
+
+/* ---- Hero başlıkta bir kez kayan altın ışık ----
+   Animasyon .is-shining ile tetiklenir; HeroIntro bittiğinde JS ekler.
+   Başlangıç pozisyonu gradyanın beyaz bölgesinde olduğu için
+   tetiklenmeden önce de başlık normal beyaz görünür. */
+.hero-shimmer {
+  background-image: linear-gradient(100deg, #ffffff 44%, var(--color-brand-gold) 50%, #ffffff 56%);
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-shimmer.is-shining {
+  animation: hero-shine 2.4s cubic-bezier(.4, 0, .2, 1) .4s 1 forwards;
+}
+@keyframes hero-shine {
+  to { background-position: 100% 0; }
+}
+
+/* ---- Kayan (marquee) destinasyon şeridi ---- */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 38s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  to { transform: translateX(-50%); }
+}
+
+/* ---- Kart üzerinde imleci takip eden spot ışığı ---- */
+.premium-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, .16),
+    transparent 60%
+  );
+}
+.premium-card:hover::before {
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .premium-card,
   .premium-cta,
-  .premium-whatsapp {
+  .premium-whatsapp,
+  .scroll-progress {
     animation: none;
     transition: none;
   }
@@ -245,5 +340,20 @@
   .premium-card:hover::after,
   .premium-cta:hover::after {
     animation: none;
+  }
+
+  /* Shimmer/marquee hareketsiz kalır, içerik görünür durumda sabitlenir */
+  .hero-shimmer {
+    animation: none;
+    background-image: none;
+    color: #ffffff;
+  }
+
+  .marquee-track {
+    animation: none;
+  }
+
+  .premium-card::before {
+    display: none;
   }
 }

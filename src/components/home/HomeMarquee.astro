@@ -1,0 +1,17 @@
+---
+---
+<!-- Kayan destinasyon şeridi -->
+<section class="marquee bg-brand-primary py-6 border-y border-white/10" aria-hidden="true">
+  <div class="marquee-track">
+    {Array.from({ length: 2 }).map(() => (
+      <div class="flex items-center shrink-0">
+        {['Phi Phi Adaları', 'Maya Bay', 'James Bond Adası', 'Similan', 'Phang Nga', 'Railay', 'Pileh Lagün', 'Koh Hong', 'Promthep Gün Batımı', 'Old Town'].map((place) => (
+          <span class="flex items-center shrink-0">
+            <span class="font-serif text-lg md:text-2xl italic text-slate-300 px-6 md:px-8 whitespace-nowrap">{place}</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0"></span>
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>

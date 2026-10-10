@@ -5,7 +5,7 @@ interface Slide {
 }
 
 const slides: Slide[] = [
-  { src: '/assets/phuket_hero.jpg', alt: "Phuket Kumsalları ve Turkuaz Deniz" },
+  { src: '/assets/phuket_hero.webp', alt: "Phuket Kumsalları ve Turkuaz Deniz" },
   { src: '/assets/pileh.webp', alt: "Phi Phi Pi Leh Zümrüt Lagün" },
   { src: '/assets/yacht.webp', alt: "Lüks VIP Yat ve Katamaran Deneyimi" },
   { src: '/assets/longtail.webp', alt: "Geleneksel Longtail Rotaları" },
@@ -39,7 +39,7 @@ const slides: Slide[] = [
       <button
         type="button"
         class={`hero-indicator h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-          index === 0 ? 'w-8 bg-brand-accent' : 'w-2.5 bg-white/40 hover:bg-white/80'
+          index === 0 ? 'w-8 bg-brand-gold' : 'w-2.5 bg-white/40 hover:bg-white/80'
         }`}
         data-index={index}
         aria-label={`Slayt ${index + 1}`}
@@ -69,7 +69,7 @@ const slides: Slide[] = [
     const goToSlide = (targetIndex: number) => {
       slides[currentIndex].classList.remove('opacity-100', 'z-[1]');
       slides[currentIndex].classList.add('opacity-0', 'z-0', 'pointer-events-none');
-      indicators[currentIndex].classList.remove('w-8', 'bg-brand-accent');
+      indicators[currentIndex].classList.remove('w-8', 'bg-brand-gold');
       indicators[currentIndex].classList.add('w-2.5', 'bg-white/40');
 
       currentIndex = (targetIndex + slides.length) % slides.length;
@@ -77,7 +77,7 @@ const slides: Slide[] = [
       slides[currentIndex].classList.remove('opacity-0', 'z-0', 'pointer-events-none');
       slides[currentIndex].classList.add('opacity-100', 'z-[1]');
       indicators[currentIndex].classList.remove('w-2.5', 'bg-white/40');
-      indicators[currentIndex].classList.add('w-8', 'bg-brand-accent');
+      indicators[currentIndex].classList.add('w-8', 'bg-brand-gold');
     };
 
     const nextSlide = () => goToSlide(currentIndex + 1);

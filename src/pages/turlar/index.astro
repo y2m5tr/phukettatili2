@@ -1,13 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import FadeIn from '../../components/ui/FadeIn';
 import TourShowcase from '../../components/ui/TourShowcase';
 
-
 export const prerender = true;
 
-const tours = await getCollection('tours');
+const tours: CollectionEntry<'tours'>[] = await getCollection('tours');
 const categoriesCollection = await getCollection('categories');
 const sortedTours = [...tours].sort((a, b) => a.data.order - b.data.order);
 const sliderTours = [...tours]
@@ -26,9 +25,24 @@ const categories = uniqueCategorySlugs.map(slug => ({
   slug,
   label: categoryMap.get(slug) || slug.replace(/-/g, ' ')
 }));
+
+const site = Astro.site || 'https://phukettatili.com';
+const schemas: Record<string, unknown>[] = [
+  {
+    "@type": "ItemList",
+    "name": "Phuket Turları",
+    "numberOfItems": sortedTours.length,
+    "itemListElement": sortedTours.map((tour, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "url": new URL(`/turlar/${tour.id}/`, site).toString(),
+      "name": tour.data.title,
+    })),
+  },
+];
 ---
 
-<Layout title="Tüm Turlar" description="Phuket'teki tüm turlarımız ve rotalarımız.">
+<Layout title="Tüm Turlar" description="Phuket'teki tüm turlarımız ve rotalarımız." schemas={schemas}>
   <div class="bg-brand-primary text-white py-16 px-4 relative overflow-hidden">
     <div class="max-w-6xl mx-auto text-center relative z-10">
       <FadeIn client:load direction="up">
@@ -45,16 +59,26 @@ const categories = uniqueCategorySlugs.map(slug => ({
     </div>
   </div>
 
-  <section class="py-16 bg-slate-50 dark:bg-[#0a0f1a] px-4">
+  <section class="py-16 bg-slate-50 dark:bg-surface-1 px-4">
     <div class="max-w-6xl mx-auto">
       
-      <!-- Filter Categories -->
-      <div class="flex flex-wrap justify-center gap-4 mb-12">
-        <button data-filter="all" class="filter-btn px-6 py-2.5 rounded-full bg-brand-accent text-white font-medium shadow-md transition-colors">Tümü</button>
+      <!-- Filter Categories (SEO-friendly crawlable links with JS instant filtering) -->
+      <div class="flex flex-wrap justify-center gap-3 md:gap-4 mb-12">
+        <a 
+          href="/turlar/" 
+          data-filter="all" 
+          class="filter-btn px-6 py-2.5 rounded-full bg-brand-accent text-white font-medium shadow-md transition-all duration-300 hover:scale-105"
+        >
+          Tümü
+        </a>
         {categories.map(cat => (
-          <button data-filter={cat.slug} class="filter-btn px-6 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium shadow hover:shadow-md transition-colors border border-slate-100 dark:border-slate-700">
+          <a 
+            href={`/turlar/?kategori=${cat.slug}`} 
+            data-filter={cat.slug} 
+            class="filter-btn px-6 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium shadow hover:shadow-md transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:scale-105"
+          >
             {cat.label}
-          </button>
+          </a>
         ))}
       </div>
 
@@ -66,7 +90,7 @@ const categories = uniqueCategorySlugs.map(slug => ({
               <a href={`/turlar/${tour.id}`} class="premium-card group block rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
                 <div class="relative h-64 overflow-hidden">
                   <img 
-                    src={`/assets/${tour.data.image}`} 
+                    src={`/assets/${tour.data.image || 'phuket_tours.webp'}`} 
                     alt={tour.data.title}
                     loading="lazy"
                     decoding="async"
@@ -106,29 +130,37 @@ const categories = uniqueCategorySlugs.map(slug => ({
 </Layout>
 
 <script>
-  // Script that runs on client side to handle filtering
+  // Script that runs on client side to handle SEO query-string filtering (?kategori=slug)
   document.addEventListener('astro:page-load', () => {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const tourCards = document.querySelectorAll('.tour-card');
+    const filterBtns = document.querySelectorAll<HTMLAnchorElement>('.filter-btn');
+    const tourCards = document.querySelectorAll<HTMLElement>('.tour-card');
     const noToursMessage = document.getElementById('no-tours-message');
 
-    // Function to apply filter
-    function applyFilter(filterValue: string) {
-      // Update buttons active state
+    if (!filterBtns.length || !tourCards.length) return;
+
+    function applyFilter(filterValue: string, updateUrl = true) {
+      // Normalize
+      const targetCategory = filterValue.trim().toLowerCase();
+
+      // Update buttons active visual state
       filterBtns.forEach(btn => {
-        if (btn.getAttribute('data-filter') === filterValue) {
+        const btnFilter = (btn.getAttribute('data-filter') || '').toLowerCase();
+        const isActive = btnFilter === targetCategory || (targetCategory === '' && btnFilter === 'all');
+        
+        if (isActive) {
           btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
-          btn.classList.add('bg-brand-accent', 'text-white');
+          btn.classList.add('bg-brand-accent', 'text-white', 'shadow-md');
         } else {
           btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
-          btn.classList.remove('bg-brand-accent', 'text-white');
+          btn.classList.remove('bg-brand-accent', 'text-white', 'shadow-md');
         }
       });
 
       // Filter cards
       let visibleCount = 0;
-      tourCards.forEach((card: any) => {
-        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+      tourCards.forEach(card => {
+        const cardCategory = (card.getAttribute('data-category') || '').toLowerCase();
+        if (targetCategory === 'all' || targetCategory === '' || cardCategory === targetCategory) {
           card.style.display = 'block';
           visibleCount++;
         } else {
@@ -136,35 +168,47 @@ const categories = uniqueCategorySlugs.map(slug => ({
         }
       });
 
-      // Show/hide no tours message
+      // Show/hide empty state
       if (noToursMessage) {
-        if (visibleCount === 0) {
-          noToursMessage.classList.remove('hidden');
-        } else {
-          noToursMessage.classList.add('hidden');
-        }
+        noToursMessage.classList.toggle('hidden', visibleCount > 0);
       }
-      
-      // Update URL hash without jumping
-      history.replaceState(null, '', filterValue === 'all' ? window.location.pathname : `#${filterValue}`);
+
+      // Update URL with query string for clean indexing and shareability
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (targetCategory === 'all' || targetCategory === '') {
+          url.searchParams.delete('kategori');
+          url.searchParams.delete('category');
+        } else {
+          url.searchParams.set('kategori', targetCategory);
+          url.searchParams.delete('category');
+        }
+        url.hash = '';
+        window.history.pushState({ kategori: targetCategory }, '', url.toString());
+      }
     }
 
-    // Add click events to buttons
+    // Attach click events
     filterBtns.forEach(btn => {
-      btn.addEventListener('click', (e: any) => {
-        const target = e.currentTarget || e.target;
-        const filterValue = target.getAttribute('data-filter');
-        if (filterValue) applyFilter(filterValue);
+      btn.addEventListener('click', (e: MouseEvent) => {
+        e.preventDefault();
+        const filterVal = btn.getAttribute('data-filter') || 'all';
+        applyFilter(filterVal, true);
       });
     });
 
-    // Read initial hash on load if present
-    const initialHash = window.location.hash.replace('#', '');
-    if (initialHash) {
-      const validCategories = Array.from(filterBtns).map(btn => btn.getAttribute('data-filter'));
-      if (validCategories.includes(initialHash)) {
-        applyFilter(initialHash);
-      }
+    // Handle browser Back / Forward buttons
+    window.addEventListener('popstate', () => {
+      const params = new URLSearchParams(window.location.search);
+      const queryCat = params.get('kategori') || params.get('category') || window.location.hash.replace('#', '') || 'all';
+      applyFilter(queryCat, false);
+    });
+
+    // Read initial category on page load
+    const params = new URLSearchParams(window.location.search);
+    const initialCategory = params.get('kategori') || params.get('category') || window.location.hash.replace('#', '');
+    if (initialCategory) {
+      applyFilter(initialCategory, false);
     }
   });
 </script>

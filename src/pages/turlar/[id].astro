@@ -1,39 +1,109 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Accordion from '../../components/ui/Accordion';
+import FadeIn from '../../components/ui/FadeIn';
+import siteSettings from '../../content/settings/site.json';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const tours = await getCollection('tours');
+  const tours: CollectionEntry<'tours'>[] = await getCollection('tours');
   return tours.map((tour) => ({
     params: { id: tour.id },
     props: { tour },
   }));
 }
 
+interface Props {
+  tour: CollectionEntry<'tours'>;
+}
+
 const { tour } = Astro.props;
 const { Content } = await render(tour);
+const whatsappNumber = siteSettings?.whatsappNumber || '66828950665';
+
+// Benzer turlar: aynı kategoriden, mevcut tur hariç, sıralamaya göre ilk 3
+const allToursForRelated: CollectionEntry<'tours'>[] = await getCollection('tours');
+const relatedTours = allToursForRelated
+  .filter((t) => t.id !== tour.id && t.data.category === tour.data.category)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const site = Astro.site || 'https://phukettatili.com';
+const tourURL = new URL(`/turlar/${tour.id}/`, site).toString();
+
+const productSchema: Record<string, unknown> = {
+  "@type": "Product",
+  "name": tour.data.title,
+  "description": tour.data.excerpt || tour.data.title,
+  "url": tourURL,
+  ...(tour.data.image ? { "image": new URL(`/assets/${tour.data.image}`, site).toString() } : {}),
+  "brand": { "@type": "Brand", "name": "Phuket Tatili" },
+};
+
+if (tour.data.price_thb && tour.data.price_thb > 0) {
+  productSchema["offers"] = {
+    "@type": "Offer",
+    "price": tour.data.price_thb,
+    "priceCurrency": "THB",
+    "url": tourURL,
+    "availability": "https://schema.org/InStock",
+  };
+}
+
+const breadcrumbSchema = {
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": new URL('/', site).toString() },
+    { "@type": "ListItem", "position": 2, "name": "Turlar", "item": new URL('/turlar/', site).toString() },
+    ...(tour.data.category
+      ? [{
+          "@type": "ListItem",
+          "position": 3,
+          "name": tour.data.category_label || tour.data.category,
+          "item": new URL(`/tur-kategorisi/${tour.data.category}/`, site).toString(),
+        }]
+      : []),
+    { "@type": "ListItem", "position": tour.data.category ? 4 : 3, "name": tour.data.title, "item": tourURL },
+  ],
+};
+
+const schemas: Record<string, unknown>[] = [productSchema, breadcrumbSchema];
+
+if (tour.data.faq && tour.data.faq.length > 0) {
+  schemas.push({
+    "@type": "FAQPage",
+    "mainEntity": tour.data.faq.map((item) => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a },
+    })),
+  });
+}
+
+// Initial WhatsApp message template
+const initialMessage = `Merhaba, ${tour.data.title} turu için 2 Kişilik uygunluk durumu ve fiyat teklifi almak istiyorum.`;
+const initialWhatsAppUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(initialMessage)}`;
 ---
 
-<Layout title={tour.data.title} description={tour.data.excerpt} image={`/assets/${tour.data.image}`}>
+<Layout title={tour.data.title} description={tour.data.excerpt} image={tour.data.image ? `/assets/${tour.data.image}` : undefined} schemas={schemas}>
   <!-- Hero Section for Tour -->
   <section class="relative h-[60vh] min-h-[400px] flex items-end pb-12">
     <div class="absolute inset-0 z-0">
       <img
-        src={`/assets/${tour.data.image}`}
+        src={`/assets/${tour.data.image || 'phuket_tours.webp'}`}
         alt={tour.data.title}
         loading="eager"
         fetchpriority="high"
         decoding="async"
         class="w-full h-full object-cover animate-ken-burns"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-[#0a0f1a]/50 to-transparent z-10"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-surface-1 via-surface-1/50 to-transparent z-10"></div>
     </div>
 
     <div class="relative z-20 max-w-6xl mx-auto px-4 w-full">
-      <span class="inline-block bg-brand-accent text-white px-3 py-1 rounded-full text-sm font-bold tracking-wide uppercase mb-4 shadow-lg">
+      <span class="inline-block bg-brand-accent text-white px-3.5 py-1 rounded-full text-sm font-bold tracking-wide uppercase mb-4 shadow-lg">
         {tour.data.category_label || tour.data.category}
       </span>
       <h1 class="text-4xl md:text-6xl text-white mb-4 drop-shadow-md">
@@ -42,16 +112,16 @@ const { Content } = await render(tour);
       <div class="flex flex-wrap items-center gap-6 text-slate-200">
         {tour.data.duration && (
           <div class="flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>{tour.data.duration}</span>
+            <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="font-medium">{tour.data.duration}</span>
           </div>
         )}
         {tour.data.price_thb && tour.data.price_thb > 0 ? (
-          <div class="flex items-center gap-2 font-bold text-xl text-white">
+          <div class="flex items-center gap-2 font-bold text-2xl text-white">
             <span>{tour.data.price_thb.toLocaleString()} THB</span>
           </div>
         ) : (
-          <div class="flex items-center gap-2 font-semibold text-base text-brand-accent bg-white/10 backdrop-blur px-3 py-1 rounded-full border border-white/20">
+          <div class="flex items-center gap-2 font-semibold text-base text-brand-accent bg-white/10 backdrop-blur px-3.5 py-1.5 rounded-full border border-white/20">
             <span>Fiyat Teklifi Alın</span>
           </div>
         )}
@@ -60,7 +130,7 @@ const { Content } = await render(tour);
   </section>
 
   <!-- Content Section -->
-  <section class="py-16 pb-32 bg-slate-50 dark:bg-[#0a0f1a]">
+  <section class="py-16 pb-32 bg-slate-50 dark:bg-surface-1">
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-12">
       <!-- Main Content -->
       <div class="lg:col-span-2 prose prose-lg prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-brand-primary dark:prose-headings:text-white prose-a:text-brand-accent hover:prose-a:text-brand-primary max-w-none">
@@ -78,7 +148,7 @@ const { Content } = await render(tour);
                 
                 return (
                   <div class="relative pl-8">
-                    <span class="absolute -left-[11px] top-1 w-5 h-5 rounded-full bg-brand-accent border-4 border-slate-50 dark:border-[#0a0f1a]"></span>
+                    <span class="absolute -left-[11px] top-1 w-5 h-5 rounded-full bg-brand-accent border-4 border-slate-50 dark:border-surface-1"></span>
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                       {time && <span class="inline-block bg-brand-accent/10 text-brand-accent font-bold px-3 py-1 rounded-full text-sm mb-3">{time.trim()}</span>}
                       <p class="text-slate-600 dark:text-slate-300 m-0 leading-relaxed">{desc.trim()}</p>
@@ -90,16 +160,33 @@ const { Content } = await render(tour);
           </div>
         )}
 
+        <!-- Gallery with Lightbox -->
         {tour.data.gallery && tour.data.gallery.length > 0 && (
           <div class="mt-16">
-            <h3 class="text-3xl border-b border-slate-200 dark:border-slate-800 pb-4 mb-8">Galeri</h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {tour.data.gallery.map((img) => (
-                <img 
-                  src={`/assets/${img}`} 
-                  alt="Tur Fotoğrafı" 
-                  class="w-full h-48 md:h-56 object-cover rounded-2xl shadow-sm hover:scale-105 transition-transform cursor-pointer" 
-                />
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-8">
+              <h3 class="text-3xl m-0">Galeri</h3>
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Büyütmek için fotoğrafa tıklayın</span>
+            </div>
+            <div id="tour-gallery-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 not-prose">
+              {tour.data.gallery.map((img, idx) => (
+                <button
+                  type="button"
+                  class="gallery-trigger group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent cursor-pointer border border-slate-100 dark:border-slate-700"
+                  data-index={idx}
+                  data-src={`/assets/${img}`}
+                  aria-label={`${tour.data.title} Fotoğraf ${idx + 1}`}
+                >
+                  <img 
+                    src={`/assets/${img}`} 
+                    alt={`${tour.data.title} Fotoğraf ${idx + 1}`} 
+                    loading="lazy"
+                    decoding="async"
+                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" 
+                  />
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path></svg>
+                  </div>
+                </button>
               ))}
             </div>
           </div>
@@ -115,40 +202,80 @@ const { Content } = await render(tour);
 
       <!-- Sidebar -->
       <div class="lg:col-span-1">
-        <div class="sticky top-28 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-100 dark:border-slate-700">
-          <h3 class="font-serif text-2xl font-bold text-brand-primary dark:text-white mb-6">Rezervasyon</h3>
-          <p class="text-slate-600 dark:text-slate-400 mb-8">Bu tur için uygunluğu kontrol etmek ve hemen rezervasyon yapmak için bize WhatsApp'tan ulaşın.</p>
+        <div class="sticky top-28 bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-7 lg:p-8 border border-slate-100 dark:border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-serif text-2xl font-bold text-brand-primary dark:text-white">Rezervasyon & Teklif</h3>
+            <span class="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse" title="WhatsApp Canlı Destek"></span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
+            Tur tarihi ve kişi sayınızı seçerek anında WhatsApp üzerinden özel fiyat teklifi ve müsaitlik alabilirsiniz.
+          </p>
           
+          <!-- Booking Interactive Form (Syncs to WhatsApp message) -->
+          <div class="space-y-4 mb-6">
+            <div>
+              <label for="booking-date-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Tur Tarihi
+              </label>
+              <input 
+                type="date" 
+                id="booking-date-input"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all"
+              />
+            </div>
+
+            <div>
+              <label for="booking-guests-select" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Kişi Sayısı
+              </label>
+              <select 
+                id="booking-guests-select"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all"
+              >
+                <option value="1 Kişi">1 Kişi</option>
+                <option value="2 Kişi" selected>2 Kişi (Önerilen)</option>
+                <option value="3 Kişi">3 Kişi</option>
+                <option value="4 Kişi">4 Kişi (Aile / Küçük Grup)</option>
+                <option value="5 Kişi">5 Kişi</option>
+                <option value="6+ Kişi">6+ Kişi (Özel Grup Teklifi)</option>
+              </select>
+            </div>
+          </div>
+
           <a 
-            href={`https://wa.me/66828950665?text=${encodeURIComponent(`Merhaba, ${tour.data.title} turu hakkında bilgi almak istiyorum.`)}`}
+            id="whatsapp-booking-btn"
+            href={initialWhatsAppUrl}
             target="_blank"
-            class="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#128C7E] text-white px-6 py-4 rounded-xl font-bold transition-colors shadow-lg shadow-green-500/30"
+            rel="noopener noreferrer"
+            data-tour-title={tour.data.title}
+            data-wa-number={whatsappNumber}
+            class="premium-cta flex items-center justify-center gap-2.5 w-full bg-[#25D366] hover:bg-[#128C7E] text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg shadow-green-500/30 transform hover:-translate-y-0.5"
           >
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp'tan Sor
+            <span>WhatsApp ile Teklif Al</span>
           </a>
 
           {(tour.data.included && tour.data.included.length > 0) || (tour.data.excluded && tour.data.excluded.length > 0) ? (
             <div class="mt-8 border-t border-slate-100 dark:border-slate-700 pt-6">
               {tour.data.included && tour.data.included.length > 0 && (
                 <div class="mb-6">
-                  <h4 class="font-bold mb-3 text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <h4 class="font-bold mb-3 text-slate-800 dark:text-slate-200 flex items-center gap-2 text-sm">
                     <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Dahil Olanlar
+                    Fiyata Dahil Olanlar
                   </h4>
-                  <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
-                    {tour.data.included.map(item => <li>• {item}</li>)}
+                  <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                    {tour.data.included.map(item => <li class="flex items-start gap-1.5"><span class="text-green-500">✓</span><span>{item}</span></li>)}
                   </ul>
                 </div>
               )}
               {tour.data.excluded && tour.data.excluded.length > 0 && (
                 <div>
-                  <h4 class="font-bold mb-3 text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <h4 class="font-bold mb-3 text-slate-800 dark:text-slate-200 flex items-center gap-2 text-sm">
                     <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     Dahil Olmayanlar
                   </h4>
-                  <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
-                    {tour.data.excluded.map(item => <li>• {item}</li>)}
+                  <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                    {tour.data.excluded.map(item => <li class="flex items-start gap-1.5"><span class="text-red-500">✗</span><span>{item}</span></li>)}
                   </ul>
                 </div>
               )}
@@ -156,13 +283,223 @@ const { Content } = await render(tour);
           ) : null}
         </div>
       </div>
+
+      <!-- Mobile Floating Booking CTA Bar -->
       <a
-        href={`https://wa.me/66828950665?text=${encodeURIComponent(`Merhaba, ${tour.data.title} turu hakkında bilgi almak istiyorum.`)}`}
+        id="mobile-wa-booking-btn"
+        href={initialWhatsAppUrl}
         target="_blank"
-        class="mobile-booking-cta premium-cta fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-4 font-bold text-white shadow-2xl shadow-green-900/30 md:hidden"
+        rel="noopener noreferrer"
+        class="mobile-booking-cta premium-cta fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] px-5 py-4 font-bold text-white shadow-2xl shadow-green-900/40 md:hidden text-base"
       >
-        WhatsApp'tan hemen bilgi al
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span>WhatsApp ile Teklif Al</span>
       </a>
     </div>
   </section>
+
+  <!-- Related Tours (same category, SEO cross-links) -->
+  {relatedTours.length > 0 && (
+    <section class="py-16 bg-white dark:bg-surface-1 px-4 border-t border-slate-100 dark:border-slate-800">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <span class="text-xs uppercase tracking-widest text-brand-accent font-bold">Benzer Deneyimler</span>
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-brand-primary dark:text-white mt-2">
+              {tour.data.category_label || 'Aynı Kategoride'} Turları
+            </h2>
+          </div>
+          <a href={`/tur-kategorisi/${tour.data.category}`} class="text-sm font-semibold text-brand-accent hover:underline whitespace-nowrap shrink-0">
+            Tümünü Gör →
+          </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {relatedTours.map((t) => (
+            <a href={`/turlar/${t.id}`} class="premium-card group block rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
+              <div class="relative h-44 overflow-hidden">
+                <img
+                  src={`/assets/${t.data.image || 'phuket_tours.webp'}`}
+                  alt={t.data.title}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                />
+                <div class="absolute inset-0 bg-brand-primary/20 group-hover:bg-transparent transition-colors duration-500"></div>
+              </div>
+              <div class="p-5">
+                <h3 class="text-lg font-bold text-brand-primary dark:text-white group-hover:text-brand-accent transition-colors line-clamp-1">{t.data.title}</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-sm mt-1.5 line-clamp-2">{t.data.excerpt}</p>
+                <div class="flex justify-between items-center border-t border-slate-100 dark:border-slate-700 pt-3 mt-3">
+                  <span class="text-xs font-medium text-slate-500 dark:text-slate-400">{t.data.duration || 'Tam Gün'}</span>
+                  {t.data.price_thb && t.data.price_thb > 0 ? (
+                    <span class="text-sm font-bold text-brand-primary dark:text-white">{t.data.price_thb.toLocaleString()} THB</span>
+                  ) : (
+                    <span class="text-xs font-bold text-brand-accent">Teklif Alın</span>
+                  )}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div 
+    id="gallery-lightbox" 
+    class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Tur Galerisi Büyütülmüş Görünüm"
+  >
+    <!-- Counter & Close Bar -->
+    <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
+      <div id="lightbox-counter" class="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur text-white text-xs font-semibold">
+        1 / 1
+      </div>
+      <button 
+        id="lightbox-close-btn" 
+        type="button" 
+        class="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent cursor-pointer"
+        aria-label="Kapat"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <!-- Nav Arrows -->
+    <button 
+      id="lightbox-prev-btn" 
+      type="button" 
+      class="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent cursor-pointer"
+      aria-label="Önceki Fotoğraf"
+    >
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+
+    <button 
+      id="lightbox-next-btn" 
+      type="button" 
+      class="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent cursor-pointer"
+      aria-label="Sonraki Fotoğraf"
+    >
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+
+    <!-- Main Active Image -->
+    <div class="relative max-w-5xl max-h-[85vh] w-full flex items-center justify-center p-2">
+      <img 
+        id="lightbox-img" 
+        src="" 
+        alt="Phuket Tur Fotoğrafı" 
+        class="max-w-full max-h-[82vh] object-contain rounded-2xl shadow-2xl transition-all duration-300 select-none"
+      />
+    </div>
+  </div>
 </Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    // 1. Dynamic WhatsApp Reservation Generator
+    const dateInput = document.getElementById('booking-date-input') as HTMLInputElement | null;
+    const guestsSelect = document.getElementById('booking-guests-select') as HTMLSelectElement | null;
+    const desktopBtn = document.getElementById('whatsapp-booking-btn') as HTMLAnchorElement | null;
+    const mobileBtn = document.getElementById('mobile-wa-booking-btn') as HTMLAnchorElement | null;
+
+    if (desktopBtn) {
+      const tourTitle = desktopBtn.dataset.tourTitle || '';
+      const waNumber = desktopBtn.dataset.waNumber || '66828950665';
+
+      // Set date input minimum to today
+      if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+      }
+
+      const updateWhatsAppUrl = () => {
+        const selectedDate = dateInput?.value || '';
+        const selectedGuests = guestsSelect?.value || '2 Kişi';
+
+        let dateStr = '';
+        if (selectedDate) {
+          const parts = selectedDate.split('-');
+          if (parts.length === 3) {
+            dateStr = `${parts[2]}.${parts[1]}.${parts[0]} tarihinde `;
+          }
+        }
+
+        const message = `Merhaba, ${tourTitle} için ${dateStr}${selectedGuests} teklif ve uygunluk bilgisi almak istiyorum.`;
+        const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+
+        if (desktopBtn) desktopBtn.href = waUrl;
+        if (mobileBtn) mobileBtn.href = waUrl;
+      };
+
+      dateInput?.addEventListener('change', updateWhatsAppUrl);
+      guestsSelect?.addEventListener('change', updateWhatsAppUrl);
+    }
+
+    // 2. Gallery Lightbox Functionality
+    const lightbox = document.getElementById('gallery-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const lightboxCounter = document.getElementById('lightbox-counter');
+    const closeBtn = document.getElementById('lightbox-close-btn');
+    const prevBtn = document.getElementById('lightbox-prev-btn');
+    const nextBtn = document.getElementById('lightbox-next-btn');
+    const triggers = document.querySelectorAll<HTMLButtonElement>('.gallery-trigger');
+
+    if (lightbox && lightboxImg && triggers.length > 0) {
+      const images: string[] = [];
+      triggers.forEach(t => {
+        const src = t.dataset.src;
+        if (src) images.push(src);
+      });
+
+      let activeIndex = 0;
+
+      const showLightbox = (index: number) => {
+        activeIndex = (index + images.length) % images.length;
+        lightboxImg.src = images[activeIndex];
+        if (lightboxCounter) {
+          lightboxCounter.textContent = `${activeIndex + 1} / ${images.length}`;
+        }
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      };
+
+      const hideLightbox = () => {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        document.body.style.overflow = '';
+      };
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const idx = Number(trigger.dataset.index || 0);
+          showLightbox(idx);
+        });
+      });
+
+      closeBtn?.addEventListener('click', hideLightbox);
+      prevBtn?.addEventListener('click', () => showLightbox(activeIndex - 1));
+      nextBtn?.addEventListener('click', () => showLightbox(activeIndex + 1));
+
+      // Click backdrop to close
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+          hideLightbox();
+        }
+      });
+
+      // Keyboard Controls
+      document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('hidden')) return;
+        if (e.key === 'Escape') hideLightbox();
+        if (e.key === 'ArrowLeft') showLightbox(activeIndex - 1);
+        if (e.key === 'ArrowRight') showLightbox(activeIndex + 1);
+      });
+    }
+  });
+</script>

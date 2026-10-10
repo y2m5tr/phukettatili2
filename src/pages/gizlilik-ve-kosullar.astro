@@ -1,14 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FadeIn from '../components/ui/FadeIn';
+import siteSettings from '../content/settings/site.json';
 
 export const prerender = true;
+
+const whatsappNumber = siteSettings?.whatsappNumber || '66828950665';
+const email = siteSettings?.email || 'info@phukettatili.com';
 ---
 
 <Layout title="Gizlilik ve Koşullar" description="Phuket Tatili için gizlilik politikamız ve hizmet şartlarımız.">
   <div class="bg-brand-primary text-white py-24 px-4 relative overflow-hidden">
     <div class="absolute inset-0 opacity-30 z-0">
-      <img src="/assets/phuket_culture.jpg" alt="Phuket Privacy" class="w-full h-full object-cover animate-ken-burns" />
+      <img src="/assets/phuket_culture.webp" alt="Phuket Privacy" class="w-full h-full object-cover animate-ken-burns" />
     </div>
     <div class="relative max-w-4xl mx-auto text-center z-10">
       <FadeIn client:load direction="up">
@@ -60,8 +64,8 @@ export const prerender = true;
               Sorularınız, şikayetleriniz veya kişisel veri talepleriniz için:
             </p>
             <p class="font-medium text-brand-accent">
-              WhatsApp: <a href="https://wa.me/66828950665" class="hover:underline">+66 82 895 0665</a><br />
-              E-posta: <a href="mailto:info@phukettatili.com" class="hover:underline">info@phukettatili.com</a>
+              WhatsApp: <a href={`https://wa.me/${whatsappNumber}`} class="hover:underline">+66 82 895 0665</a><br />
+              E-posta: <a href={`mailto:${email}`} class="hover:underline">{email}</a>
             </p>
           </div>
         </div>

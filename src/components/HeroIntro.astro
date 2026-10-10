@@ -345,7 +345,7 @@
 
   /* ilerleme çubuğu + atla */
   .intro-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.18); z-index: 40; }
-  .intro-progress-bar { display: block; height: 100%; width: 100%; background: var(--color-brand-accent); transform: scaleX(0); transform-origin: left; animation: hi-bar 7200ms linear forwards; }
+  .intro-progress-bar { display: block; height: 100%; width: 100%; background: var(--color-brand-gold); transform: scaleX(0); transform-origin: left; animation: hi-bar 7200ms linear forwards; }
   @keyframes hi-bar { to { transform: scaleX(1); } }
   .intro-skip {
     position: absolute; right: 18px; bottom: 20px; z-index: 40; cursor: pointer;
@@ -354,7 +354,7 @@
     padding: 8px 16px; font: 500 13px/1 "DM Sans", sans-serif; letter-spacing: .04em;
     transition: background .2s, transform .2s; opacity: 0; animation: s-in .5s ease forwards; animation-delay: 400ms;
   }
-  .intro-skip:hover { background: rgba(217,119,6,.85); transform: translateY(-1px); }
+  .intro-skip:hover { background: rgba(180,83,9,.9); transform: translateY(-1px); }
 
   @keyframes hi-out-fast { to { opacity: 0; visibility: hidden; pointer-events: none; } }
   .hero-intro.is-skipped { animation: hi-out-fast 380ms ease forwards; animation-delay: 0ms; }
@@ -365,22 +365,40 @@
 </style>
 
 <script>
+  const triggerHeroShimmer = () => {
+    document.querySelector('.hero-shimmer')?.classList.add('is-shining');
+  };
+
   const setupHeroIntro = () => {
     const intro = document.getElementById('hero-intro');
-    if (!intro) return;
+    // Intro yoksa (başka sayfa) başlık ışığını hemen başlat.
+    if (!intro) { triggerHeroShimmer(); return; }
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) { intro.remove(); return; }
+    if (reduce) { intro.remove(); triggerHeroShimmer(); return; }
 
+    // Intro oturum başına bir kez oynar; sonraki sayfa görüntülemelerinde atlanır.
+    try {
+      if (sessionStorage.getItem('heroIntroSeen')) { intro.remove(); triggerHeroShimmer(); return; }
+      sessionStorage.setItem('heroIntroSeen', '1');
+    } catch {
+      // Özel modda sessionStorage erişilemeyebilir; intro yine de oynasın.
+    }
+
+    let finished = false;
     const finish = () => {
+      if (finished) return;
+      finished = true;
       intro.classList.add('is-skipped');
       window.setTimeout(() => intro.remove(), 420);
+      // Başlık ışığı intro kaybolurken başlasın.
+      window.setTimeout(triggerHeroShimmer, 200);
     };
 
     intro.querySelector('[data-skip]')?.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
     intro.addEventListener('click', finish);
-    // Emniyet: CSS zaten 7.8s'de gizler; DOM'dan da temizle.
-    window.setTimeout(() => intro.remove(), 8000);
+    // Emniyet: CSS zaten 7.8s'de gizler; DOM'dan da temizle ve ışığı tetikle.
+    window.setTimeout(finish, 8000);
   };
 
   document.addEventListener('astro:page-load', setupHeroIntro);

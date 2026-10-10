@@ -88,7 +88,7 @@ const blogCollection = defineCollection({
     title: z.string(),
     excerpt: z.string().optional(),
     cover_image: z.string().optional(),
-    date: z.any().optional(),
+    date: z.coerce.date().optional(),
     author: z.string().optional(),
     featured: z.boolean().default(false),
     related_tour: z.string().optional(),
